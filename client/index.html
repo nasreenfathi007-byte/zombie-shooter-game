@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Among Us Dupe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="auth-container">
+        <h1>Among Us Dupe</h1>
+        <div id="login-form">
+            <h2>Login</h2>
+            <input type="text" id="login-username" placeholder="Username">
+            <input type="password" id="login-password" placeholder="Password">
+            <button id="login-btn">Login</button>
+            <p>Don't have an account? <a href="#" id="show-register">Register</a></p>
+        </div>
+        <div id="register-form" class="hidden">
+            <h2>Register</h2>
+            <input type="text" id="register-username" placeholder="Username">
+            <input type="password" id="register-password" placeholder="Password">
+            <button id="register-btn">Register</button>
+            <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+        </div>
+    </div>
+
+    <div id="main-menu" class="hidden">
+        <h1>Welcome, <span id="user-display"></span></h1>
+        <div class="menu-buttons">
+            <button id="create-room-btn">Create Room</button>
+            <button id="join-room-btn">Join Room</button>
+            <button id="show-friends-btn">Friends</button>
+            <button id="logout-btn">Logout</button>
+        </div>
+    </div>
+
+    <div id="lobby-container" class="hidden">
+        <h2>Lobby: <span id="lobby-id"></span></h2>
+        <ul id="player-list"></ul>
+        <div id="color-selection">
+            <h3>Choose Color</h3>
+            <div id="color-options"></div>
+        </div>
+        <button id="start-game-btn" class="hidden">Start Game</button>
+        <button id="leave-lobby-btn">Leave Lobby</button>
+    </div>
+
+    <div id="friend-container" class="hidden">
+        <h2>Friends</h2>
+        <input type="text" id="friend-search" placeholder="Search username...">
+        <button id="search-user-btn">Search</button>
+        <div id="search-results"></div>
+        <h3>Friend Requests</h3>
+        <ul id="friend-requests"></ul>
+        <h3>Friend List</h3>
+        <ul id="friend-list"></ul>
+        <button id="close-friends-btn">Close</button>
+    </div>
+
+    <div id="game-container" class="hidden">
+        <div id="splash-screen" class="hidden">
+            <h1 id="role-text"></h1>
+        </div>
+
+        <div id="task-bar-container">
+            <div id="task-bar-label">Total Tasks Completed</div>
+            <div id="task-bar-outer">
+                <div id="task-bar-inner"></div>
+            </div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div id="game-ui">
+            <button id="use-btn">USE</button>
+            <button id="kill-btn" class="hidden">KILL</button>
+            <button id="sabotage-btn" class="hidden">SABOTAGE</button>
+            <button id="report-btn">REPORT</button>
+            <div id="role-display"></div>
+        </div>
+
+        <div id="sabotage-menu" class="hidden">
+            <h3>Sabotage</h3>
+            <button onclick="triggerSabotage('lights')">Lights</button>
+            <button onclick="triggerSabotage('reactor')">Reactor</button>
+            <button onclick="triggerSabotage('o2')">O2</button>
+            <button onclick="document.getElementById('sabotage-menu').classList.add('hidden')">Close</button>
+        </div>
+
+        <div id="meeting-ui" class="hidden">
+            <h2>Emergency Meeting!</h2>
+            <div id="voting-list"></div>
+            <button id="skip-vote-btn">Skip Vote</button>
+            <div id="chat-container">
+                <div id="chat-messages"></div>
+                <div id="chat-input-row">
+                    <input type="text" id="chat-input" placeholder="Type message...">
+                    <button id="chat-send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="ejection-screen" class="hidden">
+            <h1 id="ejection-text"></h1>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
