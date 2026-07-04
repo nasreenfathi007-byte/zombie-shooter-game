@@ -137,7 +137,7 @@ function renderDebts(debts) {
                 <p>${escapeHtml(debt.description || '')}</p>
             </div>
             <div style="display:flex; align-items:center; gap:15px;">
-                <span class="debt-amount">$${debt.amount.toFixed(2)}</span>
+                <span class="debt-amount">₹${debt.amount.toFixed(2)}</span>
                 <button class="delete-debt" onclick="deleteDebt(${debt.id})">&times;</button>
             </div>
         `;
