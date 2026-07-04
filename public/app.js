@@ -166,7 +166,7 @@ function renderExpenses(expenses) {
 
         const amount = document.createElement('div');
         amount.className = 'expense-amount';
-        amount.textContent = `$${exp.amount.toFixed(2)}`;
+        amount.textContent = `₹${exp.amount.toFixed(2)}`;
         item.appendChild(amount);
 
         const delBtn = document.createElement('div');
@@ -182,7 +182,7 @@ function renderExpenses(expenses) {
         total += exp.amount;
     });
 
-    document.getElementById('total-amount').innerText = `$${total.toFixed(2)}`;
+    document.getElementById('total-amount').innerText = `₹${total.toFixed(2)}`;
 }
 
 function openModal() {
