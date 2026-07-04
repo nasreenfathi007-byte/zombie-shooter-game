@@ -181,7 +181,16 @@ socket.on('game-over', (msg) => {
 socket.on('chat_message', (data) => {
     const msgDiv = document.createElement('div');
     msgDiv.className = 'chat-msg' + (data.isGhost ? ' ghost' : '');
-    msgDiv.innerHTML = `<span class="sender">${data.sender}${data.isGhost ? ' (Ghost)' : ''}:</span> ${data.message}`;
+
+    const senderSpan = document.createElement('span');
+    senderSpan.className = 'sender';
+    senderSpan.textContent = `${data.sender}${data.isGhost ? ' (Ghost)' : ''}: `;
+
+    const textNode = document.createTextNode(data.message);
+
+    msgDiv.appendChild(senderSpan);
+    msgDiv.appendChild(textNode);
+
     document.getElementById('chat-messages').appendChild(msgDiv);
     document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
 });

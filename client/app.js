@@ -38,7 +38,13 @@ searchUserBtn.onclick = async () => {
     searchResults.innerHTML = '';
     users.forEach(user => {
         const div = document.createElement('div');
-        div.innerHTML = `${user.username} <button onclick="sendFriendRequest(${user.id})">Add</button>`;
+        const span = document.createElement('span');
+        span.textContent = user.username + " ";
+        const btn = document.createElement('button');
+        btn.textContent = "Add";
+        btn.onclick = () => sendFriendRequest(user.id);
+        div.appendChild(span);
+        div.appendChild(btn);
         searchResults.appendChild(div);
     });
 };
@@ -64,7 +70,13 @@ async function loadFriendRequests() {
     friendRequestsList.innerHTML = '';
     requests.forEach(req => {
         const li = document.createElement('li');
-        li.innerHTML = `${req.username} <button onclick="acceptFriendRequest(${req.id})">Accept</button>`;
+        const span = document.createElement('span');
+        span.textContent = req.username + " ";
+        const btn = document.createElement('button');
+        btn.textContent = "Accept";
+        btn.onclick = () => acceptFriendRequest(req.id);
+        li.appendChild(span);
+        li.appendChild(btn);
         friendRequestsList.appendChild(li);
     });
 }

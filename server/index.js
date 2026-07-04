@@ -10,7 +10,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const JWT_SECRET = 'among_us_secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'among_us_secret_dev';
 
 app.use(express.json());
 app.use(express.static(path.resolve(__dirname, '../client')));
@@ -220,7 +220,9 @@ io.on('connection', (socket) => {
         if (target && target.alive) {
           target.alive = false;
           io.to(socket.roomId).emit('update-players', room.players);
-          if (room.players.filter(p => p.role !== 'impostor' && p.alive).length === 0) io.to(socket.roomId).emit('game-over', 'Impostors Win!');
+          const crewCount = room.players.filter(p => p.role !== 'impostor' && p.alive).length;
+          const impCount = room.players.filter(p => p.role === 'impostor' && p.alive).length;
+          if (crewCount <= impCount) io.to(socket.roomId).emit('game-over', 'Impostors Win!');
         }
       }
     }
