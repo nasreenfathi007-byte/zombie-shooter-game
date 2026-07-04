@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spending Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #bb86fc;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --secondary-text: #a0a0a0;
+            --border-color: #333333;
+            --hover-color: #2c2c2c;
+            --fab-color: #bb86fc;
+            --danger-color: #cf6679;
+        }
+
+        body.light-mode {
+            --primary-color: #1a73e8;
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --text-color: #202124;
+            --secondary-text: #5f6368;
+            --border-color: #dadce0;
+            --hover-color: #f1f3f4;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #auth-container {
+            align-self: center;
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            width: 350px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        #auth-container h1 { font-size: 1.5rem; font-weight: 400; margin-bottom: 2rem; }
+
+        input, select {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            width: 100%;
+            padding: 12px 16px;
+            margin: 8px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--primary-color); }
+
+        button.primary {
+            background-color: var(--primary-color);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        body.light-mode button.primary { color: white; }
+
+        #app-container {
+            width: 100%;
+            max-width: 600px;
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            background-color: var(--bg-color);
+        }
+
+        header {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 { font-size: 1.25rem; font-weight: 400; margin: 0; }
+
+        .user-info { font-size: 0.875rem; color: var(--secondary-text); display: flex; align-items: center; }
+
+        .logout-link { color: var(--primary-color); text-decoration: none; margin-left: 12px; cursor: pointer; }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--secondary-text);
+            cursor: pointer;
+            margin-right: 12px;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .theme-toggle:hover { background: var(--hover-color); }
+
+        .filter-bar {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #month-filter {
+            border: none;
+            width: auto;
+            padding: 4px 8px;
+            font-size: 0.875rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        main { flex: 1; overflow-y: auto; padding-bottom: 100px; }
+
+        .expense-item {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .expense-item:hover { background-color: var(--hover-color); }
+        .expense-content { flex: 1; }
+        .expense-title { font-size: 1.1rem; margin-bottom: 4px; }
+        .expense-details { font-size: 0.85rem; color: var(--secondary-text); display: flex; gap: 12px; }
+        .expense-category { background: var(--hover-color); padding: 2px 8px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .expense-amount { font-weight: 500; font-size: 1.1rem; color: var(--primary-color); margin-left: 12px; }
+        .delete-icon { color: var(--secondary-text); cursor: pointer; padding: 8px; border-radius: 50%; margin-left: 8px; }
+        .delete-icon:hover { background: var(--hover-color); color: var(--danger-color); }
+
+        #total-footer {
+            position: sticky;
+            bottom: 0;
+            background: var(--card-bg);
+            padding: 20px 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label { font-size: 0.9rem; color: var(--secondary-text); text-transform: uppercase; letter-spacing: 1px; }
+        #total-amount { font-size: 1.5rem; font-weight: 700; color: var(--primary-color); }
+
+        .fab {
+            position: absolute;
+            bottom: 100px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background-color: var(--primary-color);
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+            z-index: 10;
+        }
+
+        .fab:hover { transform: scale(1.05); }
+        .fab svg { width: 24px; height: 24px; fill: #000; }
+        body.light-mode .fab svg { fill: white; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-content h2 { font-size: 1.5rem; font-weight: 400; margin-top: 0; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+
+        .btn-text {
+            background: none; border: none; color: var(--primary-color);
+            font-weight: 500; cursor: pointer; padding: 8px 16px; border-radius: 4px;
+        }
+        .btn-text:hover { background: var(--hover-color); }
+    </style>
+</head>
+<body>
+    <div id="auth-container">
+        <h1>Spending Tracker</h1>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button class="primary" onclick="handleAuth()">Sign in / Create</button>
+        <p style="margin-top: 24px; font-size: 0.85rem; color: var(--secondary-text);">
+            Data is stored locally in this browser.
+        </p>
+    </div>
+
+    <div id="app-container">
+        <header>
+            <h1>My Expenses</h1>
+            <div class="user-info">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+                    <svg id="theme-icon" style="width:24px;height:24px" viewBox="0 0 24 24"></svg>
+                </button>
+                <span id="display-user"></span>
+                <span class="logout-link" onclick="logout()">Logout</span>
+            </div>
+        </header>
+
+        <div class="filter-bar">
+            <span style="font-size: 0.875rem; color: var(--secondary-text);">Current view</span>
+            <input type="month" id="month-filter" onchange="loadExpenses()">
+        </div>
+
+        <main id="expenses-list"></main>
+
+        <div id="total-footer">
+            <span class="total-label">Monthly Total</span>
+            <span id="total-amount">₹0.00</span>
+        </div>
+
+        <div class="fab" onclick="openModal()">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        </div>
+    </div>
+
+    <div id="expense-modal" class="modal">
+        <div class="modal-content">
+            <h2>Add expense</h2>
+            <form onsubmit="addExpense(event)">
+                <input type="text" id="exp-desc" placeholder="What did you spend on?" required>
+                <input type="number" id="exp-amount" placeholder="Amount" step="0.01" required>
+                <select id="exp-cat">
+                    <option value="General">General</option>
+                    <option value="Food">Food</option>
+                    <option value="Bills">Bills</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Fun">Fun</option>
+                </select>
+                <input type="date" id="exp-date" required>
+                <div class="modal-actions">
+                    <button type="button" class="btn-text" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-text" style="font-weight: 700;">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = localStorage.getItem('tracker_user');
+        let isLightMode = localStorage.getItem('theme') === 'light';
+
+        if (isLightMode) document.body.classList.add('light-mode');
+        updateThemeIcon();
+        if (currentUser) showApp();
+
+        function handleAuth() {
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            if (!user || !pass) return alert('Enter username and password');
+
+            const users = JSON.parse(localStorage.getItem('tracker_accounts') || '{}');
+            if (users[user]) {
+                if (users[user] !== pass) return alert('Incorrect password');
+            } else {
+                users[user] = pass;
+                localStorage.setItem('tracker_accounts', JSON.stringify(users));
+                alert('Account created!');
+            }
+
+            currentUser = user;
+            localStorage.setItem('tracker_user', currentUser);
+            showApp();
+        }
+
+        function logout() { localStorage.removeItem('tracker_user'); location.reload(); }
+
+        function showApp() {
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('app-container').style.display = 'flex';
+            document.getElementById('display-user').innerText = currentUser;
+            const now = new Date();
+            document.getElementById('month-filter').value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            loadExpenses();
+        }
+
+        function toggleTheme() {
+            isLightMode = !isLightMode;
+            document.body.classList.toggle('light-mode', isLightMode);
+            localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = document.getElementById('theme-icon');
+            if (!icon) return;
+            icon.innerHTML = isLightMode
+                ? '<path fill="currentColor" d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.88,4.88L18,4V7.12L20.88,10L20,13.12V16.26L17.12,19.14L14,18.26V21.12L10.88,24L8,21.12V18.26L5.12,15.38L6,12.26V9.12L3.12,6.24L6,5.38V2.26L9.12,3.12L12,2Z" />'
+                : '<path fill="currentColor" d="M12,18C11.11,18 10.26,17.8 9.5,17.45C11.56,16.5 13,14.42 13,12C13,9.58 11.56,7.5 9.5,6.55C10.26,6.2 11.11,6 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z" />';
+        }
+
+        function loadExpenses() {
+            const filter = document.getElementById('month-filter').value;
+            const allExpenses = JSON.parse(localStorage.getItem(`expenses_${currentUser}`) || '[]');
+            const filtered = allExpenses.filter(e => e.date.startsWith(filter));
+            const list = document.getElementById('expenses-list');
+            list.innerHTML = '';
+            let total = 0;
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<div style="text-align: center; color: var(--secondary-text); margin-top: 48px;">No records for this month.</div>';
+            }
+
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(exp => {
+                const item = document.createElement('div');
+                item.className = 'expense-item';
+                const content = document.createElement('div');
+                content.className = 'expense-content';
+                const title = document.createElement('div');
+                title.className = 'expense-title';
+                title.textContent = exp.desc;
+                const details = document.createElement('div');
+                details.className = 'expense-details';
+                const dateSpan = document.createElement('span');
+                dateSpan.textContent = exp.date;
+                const catSpan = document.createElement('span');
+                catSpan.className = 'expense-category';
+                catSpan.textContent = exp.cat;
+                details.appendChild(dateSpan);
+                details.appendChild(catSpan);
+                content.appendChild(title);
+                content.appendChild(details);
+                const amount = document.createElement('div');
+                amount.className = 'expense-amount';
+                amount.textContent = `₹${parseFloat(exp.amount).toFixed(2)}`;
+                const del = document.createElement('div');
+                del.className = 'delete-icon';
+                del.innerHTML = '<svg style="width:20px;height:20px" viewBox="0 0 24 24"><path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>';
+                del.onclick = () => deleteExpense(exp.id);
+                item.appendChild(content);
+                item.appendChild(amount);
+                item.appendChild(del);
+                list.appendChild(item);
+                total += parseFloat(exp.amount);
+            });
+            document.getElementById('total-amount').innerText = `₹${total.toFixed(2)}`;
+        }
+
+        function openModal() {
+            document.getElementById('expense-modal').style.display = 'flex';
+            document.getElementById('exp-date').valueAsDate = new Date();
+        }
+        function closeModal() { document.getElementById('expense-modal').style.display = 'none'; }
+
+        function addExpense(e) {
+            e.preventDefault();
+            const exp = {
+                id: Date.now(),
+                desc: document.getElementById('exp-desc').value,
+                amount: document.getElementById('exp-amount').value,
+                cat: document.getElementById('exp-cat').value,
+                date: document.getElementById('exp-date').value
+            };
+            const expenses = JSON.parse(localStorage.getItem(`expenses_${currentUser}`) || '[]');
+            expenses.push(exp);
+            localStorage.setItem(`expenses_${currentUser}`, JSON.stringify(expenses));
+            closeModal();
+            loadExpenses();
+        }
+
+        function deleteExpense(id) {
+            if (!confirm('Delete entry?')) return;
+            const expenses = JSON.parse(localStorage.getItem(`expenses_${currentUser}`) || '[]');
+            localStorage.setItem(`expenses_${currentUser}`, JSON.stringify(expenses.filter(e => e.id !== id)));
+            loadExpenses();
+        }
+
+        window.onclick = (e) => { if (e.target.className == 'modal') closeModal(); }
+    </script>
+</body>
+</html>
