@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art Editor - Smooth Colour Edition</title>
+    <style>
+        :root {
+            --primary-bg: #fdf6f9;
+            --secondary-bg: #ffffff;
+            --accent-color: #ff85a2;
+            --text-color: #4a4a4a;
+            --border-color: #ffd1dc;
+            --shadow: 0 4px 6px rgba(255, 133, 162, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #app {
+            background-color: var(--secondary-bg);
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--border-color);
+            max-width: 900px;
+            width: 95%;
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 1.5rem;
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--accent-color);
+            font-size: 2.2rem;
+        }
+
+        header p {
+            margin: 0.5rem 0 0;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        main {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .canvas-container {
+            position: relative;
+            background-color: #eee;
+            background-image: linear-gradient(45deg, #ddd 25%, transparent 25%),
+                              linear-gradient(-45deg, #ddd 25%, transparent 25%),
+                              linear-gradient(45deg, transparent 75%, #ddd 75%),
+                              linear-gradient(-45deg, transparent 75%, #ddd 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px 10px, 10px 0;
+            border: 4px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        canvas {
+            display: block;
+            image-rendering: pixelated;
+            cursor: crosshair;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            min-width: 200px;
+            text-align: left;
+        }
+
+        .tool-section h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.3rem;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .tool-btn {
+            background-color: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .tool-btn:hover {
+            background-color: var(--primary-bg);
+            border-color: var(--accent-color);
+        }
+
+        .tool-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .color-swatch {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 2px solid rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+
+        .color-swatch.active {
+            border-color: var(--text-color);
+            transform: scale(1.1);
+        }
+
+        .custom-color {
+            grid-column: span 4;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        #colorPicker {
+            flex-grow: 1;
+            height: 40px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2px;
+            cursor: pointer;
+        }
+
+        .actions {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+
+        .secondary-action {
+            background-color: #a0a0a0;
+        }
+
+        .status-bar {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Pixel Art Editor</h1>
+            <p>Made with love for my sister</p>
+        </header>
+        <main>
+            <div class="canvas-container">
+                <canvas id="pixelCanvas" width="480" height="480"></canvas>
+            </div>
+            <div class="sidebar">
+                <div class="tool-section">
+                    <h3>Tools</h3>
+                    <div class="tools-grid">
+                        <button id="pencilBtn" class="tool-btn active">✏️ Pencil</button>
+                        <button id="eraserBtn" class="tool-btn">🧽 Eraser</button>
+                        <button id="bucketBtn" class="tool-btn">🪣 Bucket</button>
+                        <button id="smoothBtn" class="tool-btn">✨ Smooth</button>
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <h3>Palette</h3>
+                    <div id="palette" class="palette">
+                        <!-- Swatches added via JS -->
+                    </div>
+                    <div class="custom-color">
+                        <input type="color" id="colorPicker" value="#ff85a2">
+                    </div>
+                </div>
+                <div class="actions">
+                    <button id="clearBtn" class="action-btn secondary-action">Clear Canvas</button>
+                    <button id="downloadBtn" class="action-btn">Save Artwork</button>
+                </div>
+            </div>
+        </main>
+        <div class="status-bar">
+            Tool: <span id="currentToolText">Pencil</span> | Grid: 24x24
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 24;
+        const cellSize = canvas.width / gridSize;
+
+        let pixelData = Array(gridSize).fill().map(() => Array(gridSize).fill(null));
+        let isDrawing = false;
+        let currentTool = 'pencil';
+        let currentColor = '#ff85a2';
+        let smoothPoints = [];
+
+        function init() {
+            render();
+            setupTools();
+            setupPalette();
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    if (pixelData[y][x]) {
+                        ctx.fillStyle = pixelData[y][x];
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            drawGridLines();
+
+            // Highlight smooth points
+            smoothPoints.forEach(p => {
+                ctx.strokeStyle = '#ff85a2';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(p.x * cellSize, p.y * cellSize, cellSize, cellSize);
+            });
+        }
+
+        function drawGridLines() {
+            ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= gridSize; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * cellSize, 0);
+                ctx.lineTo(i * cellSize, canvas.height);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(0, i * cellSize);
+                ctx.lineTo(canvas.width, i * cellSize);
+                ctx.stroke();
+            }
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', stopDrawing);
+
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: Math.floor((e.clientX - rect.left) / cellSize),
+                y: Math.floor((e.clientY - rect.top) / cellSize)
+            };
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            handleAction(e);
+        }
+
+        function draw(e) {
+            if (isDrawing) handleAction(e);
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function handleAction(e) {
+            const pos = getMousePos(e);
+            if (pos.x < 0 || pos.x >= gridSize || pos.y < 0 || pos.y >= gridSize) return;
+
+            if (currentTool === 'pencil') {
+                pixelData[pos.y][pos.x] = currentColor;
+                render();
+            } else if (currentTool === 'eraser') {
+                pixelData[pos.y][pos.x] = null;
+                render();
+            } else if (currentTool === 'bucket' && e.type === 'mousedown') {
+                floodFill(pos.x, pos.y, pixelData[pos.y][pos.x], currentColor);
+                render();
+            } else if (currentTool === 'smooth' && e.type === 'mousedown') {
+                handleSmoothTool(pos);
+            }
+        }
+
+        function floodFill(startX, startY, targetColor, replacementColor) {
+            if (targetColor === replacementColor) return;
+            const stack = [[startX, startY]];
+            while (stack.length > 0) {
+                const [x, y] = stack.pop();
+                if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) continue;
+                if (pixelData[y][x] === targetColor) {
+                    pixelData[y][x] = replacementColor;
+                    stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+                }
+            }
+        }
+
+        function handleSmoothTool(pos) {
+            smoothPoints.push(pos);
+            if (smoothPoints.length === 2) {
+                createGradient(smoothPoints[0], smoothPoints[1]);
+                smoothPoints = [];
+            }
+            render();
+        }
+
+        function createGradient(p1, p2) {
+            const color1 = hexToRgb(pixelData[p1.y][p1.x] || '#ffffff');
+            const color2 = hexToRgb(currentColor);
+
+            const dx = Math.abs(p2.x - p1.x);
+            const dy = Math.abs(p2.y - p1.y);
+            const steps = Math.max(dx, dy);
+
+            for (let i = 0; i <= steps; i++) {
+                const t = steps === 0 ? 0 : i / steps;
+                const x = Math.round(p1.x + t * (p2.x - p1.x));
+                const y = Math.round(p1.y + t * (p2.y - p1.y));
+
+                const r = Math.round(color1.r + t * (color2.r - color1.r));
+                const g = Math.round(color1.g + t * (color2.g - color1.g));
+                const b = Math.round(color1.b + t * (color2.b - color1.b));
+
+                if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
+                    pixelData[y][x] = rgbToHex(r, g, b);
+                }
+            }
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 255, g: 255, b: 255 };
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        function setupTools() {
+            const buttons = {
+                'pencil': document.getElementById('pencilBtn'),
+                'eraser': document.getElementById('eraserBtn'),
+                'bucket': document.getElementById('bucketBtn'),
+                'smooth': document.getElementById('smoothBtn')
+            };
+
+            const toolText = document.getElementById('currentToolText');
+
+            Object.entries(buttons).forEach(([tool, btn]) => {
+                btn.onclick = () => {
+                    currentTool = tool;
+                    Object.values(buttons).forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    toolText.textContent = tool.charAt(0).toUpperCase() + tool.slice(1);
+
+                    // Reset smooth tool selection if switching away
+                    if (tool !== 'smooth') {
+                        smoothPoints = [];
+                        render();
+                    }
+                };
+            });
+
+            document.getElementById('clearBtn').onclick = () => {
+                if (confirm('Are you sure you want to clear your beautiful artwork?')) {
+                    pixelData = Array(gridSize).fill().map(() => Array(gridSize).fill(null));
+                    render();
+                }
+            };
+
+            document.getElementById('downloadBtn').onclick = () => {
+                const link = document.createElement('a');
+                link.download = 'pixel-art.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            };
+        }
+
+        function setupPalette() {
+            const colors = [
+                '#000000', '#ffffff', '#4a4a4a', '#a0a0a0',
+                '#ff85a2', '#ff4d6d', '#ff0000', '#ff9f1c',
+                '#ffff00', '#9ef01a', '#00ff00', '#2ec4b6',
+                '#00ffff', '#00b4d8', '#0000ff', '#7209b7',
+                '#ff00ff', '#f15bb5', '#9d4edd', '#ffd1dc'
+            ];
+            const paletteEl = document.getElementById('palette');
+            colors.forEach(c => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                if (c === currentColor) swatch.classList.add('active');
+                swatch.style.backgroundColor = c;
+                swatch.onclick = () => {
+                    currentColor = c;
+                    document.getElementById('colorPicker').value = c;
+                    updateActiveSwatch(swatch);
+                };
+                paletteEl.appendChild(swatch);
+            });
+
+            document.getElementById('colorPicker').oninput = (e) => {
+                currentColor = e.target.value;
+                updateActiveSwatch(null);
+            };
+        }
+
+        function updateActiveSwatch(activeSwatch) {
+            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            if (activeSwatch) activeSwatch.classList.add('active');
+        }
+
+        init();
+    </script>
+</body>
+</html>
