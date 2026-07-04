@@ -1,8 +1,33 @@
 let token = localStorage.getItem('token');
 let username = localStorage.getItem('username');
+let isLightMode = localStorage.getItem('theme') === 'light';
+
+if (isLightMode) {
+    document.body.classList.add('light-mode');
+    updateThemeIcon();
+}
 
 if (token) {
     showApp();
+}
+
+function toggleTheme() {
+    isLightMode = !isLightMode;
+    document.body.classList.toggle('light-mode', isLightMode);
+    localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+    updateThemeIcon();
+}
+
+function updateThemeIcon() {
+    const icon = document.getElementById('theme-icon');
+    if (!icon) return;
+    if (isLightMode) {
+        // Sun icon
+        icon.innerHTML = '<path fill="currentColor" d="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,2L14.88,4.88L18,4V7.12L20.88,10L20,13.12V16.26L17.12,19.14L14,18.26V21.12L10.88,24L8,21.12V18.26L5.12,15.38L6,12.26V9.12L3.12,6.24L6,5.38V2.26L9.12,3.12L12,2Z" />';
+    } else {
+        // Moon icon
+        icon.innerHTML = '<path fill="currentColor" d="M12,18C11.11,18 10.26,17.8 9.5,17.45C11.56,16.5 13,14.42 13,12C13,9.58 11.56,7.5 9.5,6.55C10.26,6.2 11.11,6 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z" />';
+    }
 }
 
 function toggleAuth() {
@@ -116,10 +141,6 @@ function renderExpenses(expenses) {
         const item = document.createElement('div');
         item.className = 'expense-item';
 
-        const checkbox = document.createElement('div');
-        checkbox.className = 'expense-checkbox';
-        item.appendChild(checkbox);
-
         const content = document.createElement('div');
         content.className = 'expense-content';
 
@@ -161,7 +182,7 @@ function renderExpenses(expenses) {
         total += exp.amount;
     });
 
-    document.getElementById('total-amount').innerText = total.toFixed(2);
+    document.getElementById('total-amount').innerText = `$${total.toFixed(2)}`;
 }
 
 function openModal() {
