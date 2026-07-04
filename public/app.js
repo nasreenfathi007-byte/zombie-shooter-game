@@ -29,7 +29,7 @@ async function register() {
         });
         const data = await res.json();
         if (res.ok) {
-            alert('Registration successful! Please login.');
+            alert('Account created! Please sign in.');
             toggleAuth();
         } else {
             alert(data.error);
@@ -72,8 +72,8 @@ function logout() {
 
 function showApp() {
     document.getElementById('auth-container').style.display = 'none';
-    document.getElementById('app-container').style.display = 'block';
-    document.getElementById('user-display').innerText = `Hello, ${username}!`;
+    document.getElementById('app-container').style.display = 'flex';
+    document.getElementById('user-display').innerText = username;
 
     // Set default month to current month
     const now = new Date();
@@ -84,7 +84,7 @@ function showApp() {
 }
 
 async function fetchExpenses() {
-    const filter = document.getElementById('month-filter').value; // YYYY-MM
+    const filter = document.getElementById('month-filter').value;
     try {
         const res = await fetch('/api/expenses', {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -104,42 +104,73 @@ async function fetchExpenses() {
 }
 
 function renderExpenses(expenses) {
-    const body = document.getElementById('expenses-body');
-    body.innerHTML = '';
+    const container = document.getElementById('expenses-list');
+    container.innerHTML = '';
     let total = 0;
 
+    if (expenses.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #5f6368; margin-top: 48px;">No expenses for this month.</div>';
+    }
+
     expenses.forEach(exp => {
-        const row = document.createElement('tr');
+        const item = document.createElement('div');
+        item.className = 'expense-item';
 
-        const dateCell = document.createElement('td');
-        dateCell.textContent = exp.date;
-        row.appendChild(dateCell);
+        const checkbox = document.createElement('div');
+        checkbox.className = 'expense-checkbox';
+        item.appendChild(checkbox);
 
-        const descCell = document.createElement('td');
-        descCell.textContent = exp.description;
-        row.appendChild(descCell);
+        const content = document.createElement('div');
+        content.className = 'expense-content';
 
-        const catCell = document.createElement('td');
-        catCell.textContent = exp.category;
-        row.appendChild(catCell);
+        const title = document.createElement('div');
+        title.className = 'expense-title';
+        title.textContent = exp.description;
+        content.appendChild(title);
 
-        const amountCell = document.createElement('td');
-        amountCell.textContent = `$${exp.amount.toFixed(2)}`;
-        row.appendChild(amountCell);
+        const details = document.createElement('div');
+        details.className = 'expense-details';
 
-        const actionCell = document.createElement('td');
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.onclick = () => deleteExpense(exp.id);
-        actionCell.appendChild(deleteBtn);
-        row.appendChild(actionCell);
+        const date = document.createElement('span');
+        date.textContent = exp.date;
+        details.appendChild(date);
 
-        body.appendChild(row);
+        const cat = document.createElement('span');
+        cat.className = 'expense-category';
+        cat.textContent = exp.category;
+        details.appendChild(cat);
+
+        content.appendChild(details);
+        item.appendChild(content);
+
+        const amount = document.createElement('div');
+        amount.className = 'expense-amount';
+        amount.textContent = `$${exp.amount.toFixed(2)}`;
+        item.appendChild(amount);
+
+        const delBtn = document.createElement('div');
+        delBtn.className = 'delete-icon';
+        delBtn.innerHTML = '<svg style="width:20px;height:20px" viewBox="0 0 24 24"><path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>';
+        delBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteExpense(exp.id);
+        };
+        item.appendChild(delBtn);
+
+        container.appendChild(item);
         total += exp.amount;
     });
 
     document.getElementById('total-amount').innerText = total.toFixed(2);
+}
+
+function openModal() {
+    document.getElementById('expense-modal').style.display = 'flex';
+    document.getElementById('date').valueAsDate = new Date();
+}
+
+function closeModal() {
+    document.getElementById('expense-modal').style.display = 'none';
 }
 
 document.getElementById('expense-form').addEventListener('submit', async (e) => {
@@ -160,6 +191,7 @@ document.getElementById('expense-form').addEventListener('submit', async (e) => 
         });
         if (res.ok) {
             document.getElementById('expense-form').reset();
+            closeModal();
             fetchExpenses();
         }
     } catch (err) {
@@ -168,7 +200,7 @@ document.getElementById('expense-form').addEventListener('submit', async (e) => 
 });
 
 async function deleteExpense(id) {
-    if (!confirm('Are you sure you want to delete this expense?')) return;
+    if (!confirm('Delete this expense?')) return;
 
     try {
         const res = await fetch(`/api/expenses/${id}`, {
@@ -180,5 +212,13 @@ async function deleteExpense(id) {
         }
     } catch (err) {
         console.error(err);
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('expense-modal');
+    if (event.target == modal) {
+        closeModal();
     }
 }

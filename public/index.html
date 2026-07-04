@@ -3,80 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monthly Spending Tracker</title>
+    <title>Tasks Tracker</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="auth-container">
-        <h1>Welcome!</h1>
+        <h1>Tasks Tracker</h1>
         <div id="login-form">
-            <h2>Login</h2>
             <input type="text" id="login-username" placeholder="Username">
             <input type="password" id="login-password" placeholder="Password">
-            <button onclick="login()">Login</button>
-            <p>Don't have an account? <a href="#" onclick="toggleAuth()">Register</a></p>
+            <button class="primary" onclick="login()">Sign in</button>
+            <p style="margin-top: 24px; font-size: 0.875rem;">
+                No account? <a href="#" onclick="toggleAuth()" style="color: var(--primary-color); text-decoration: none;">Create one</a>
+            </p>
         </div>
         <div id="register-form" style="display: none;">
-            <h2>Register</h2>
-            <input type="text" id="register-username" placeholder="Username">
-            <input type="password" id="register-password" placeholder="Password">
-            <button onclick="register()">Register</button>
-            <p>Already have an account? <a href="#" onclick="toggleAuth()">Login</a></p>
+            <input type="text" id="register-username" placeholder="New Username">
+            <input type="password" id="register-password" placeholder="New Password">
+            <button class="primary" onclick="register()">Create account</button>
+            <p style="margin-top: 24px; font-size: 0.875rem;">
+                Have an account? <a href="#" onclick="toggleAuth()" style="color: var(--primary-color); text-decoration: none;">Sign in</a>
+            </p>
         </div>
     </div>
 
     <div id="app-container" style="display: none;">
         <header>
-            <h1>Monthly Spending Tracker</h1>
-            <div>
+            <h1>My Expenses</h1>
+            <div class="user-info">
                 <span id="user-display"></span>
-                <button onclick="logout()">Logout</button>
+                <span class="logout-link" onclick="logout()">Logout</span>
             </div>
         </header>
 
-        <main>
-            <section id="add-expense">
-                <h2>Add Expense</h2>
-                <form id="expense-form">
-                    <input type="number" id="amount" placeholder="Amount" step="0.01" required>
-                    <input type="text" id="description" placeholder="Description" required>
-                    <select id="category">
-                        <option value="Food">Food</option>
-                        <option value="Rent">Rent</option>
-                        <option value="Utilities">Utilities</option>
-                        <option value="Entertainment">Entertainment</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <input type="date" id="date" required>
-                    <button type="submit">Add</button>
-                </form>
-            </section>
+        <div class="filter-bar">
+            <label for="month-filter">Current view</label>
+            <input type="month" id="month-filter" onchange="fetchExpenses()">
+        </div>
 
-            <section id="expense-list">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2>Expenses</h2>
-                    <div>
-                        <label for="month-filter">Month:</label>
-                        <input type="month" id="month-filter" onchange="fetchExpenses()">
-                    </div>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th>Category</th>
-                            <th>Amount</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="expenses-body"></tbody>
-                </table>
-                <div id="total-container">
-                    <strong>Total: $<span id="total-amount">0.00</span></strong>
-                </div>
-            </section>
+        <main id="expenses-list">
+            <!-- Expenses will be injected here -->
         </main>
+
+        <div id="total-footer">
+            Total: $<span id="total-amount">0.00</span>
+        </div>
+
+        <div class="fab" onclick="openModal()">
+            <svg viewBox="0 0 24 24">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Add Expense Modal -->
+    <div id="expense-modal" class="modal">
+        <div class="modal-content">
+            <h2>Add expense</h2>
+            <form id="expense-form">
+                <input type="text" id="description" placeholder="What did you spend on?" required>
+                <input type="number" id="amount" placeholder="Amount" step="0.01" required>
+                <select id="category">
+                    <option value="General">General</option>
+                    <option value="Food">Food</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Home">Home</option>
+                    <option value="Fun">Fun</option>
+                </select>
+                <input type="date" id="date" required>
+                <div class="modal-actions">
+                    <button type="button" class="btn-text" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-text" style="font-weight: 700;">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="app.js"></script>
