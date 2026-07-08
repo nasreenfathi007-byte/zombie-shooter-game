@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OweTrack - Minimalist Debt Tracker</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #bb86fc;
+            --error-color: #cf6679;
+            --input-bg: #2c2c2c;
+            --border-radius: 8px;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            margin: 0;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 24px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--input-bg);
+        }
+
+        .tabs button {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            padding: 10px;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: 0.3s;
+        }
+
+        .tabs button.active {
+            opacity: 1;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        input {
+            background-color: var(--input-bg);
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: 2px solid var(--accent-color);
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            filter: brightness(1.2);
+        }
+
+        .text-btn {
+            background: none;
+            color: var(--accent-color);
+            padding: 5px;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+
+        .error {
+            color: var(--error-color);
+            font-size: 0.85rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #debts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .debt-item {
+            background-color: var(--input-bg);
+            padding: 16px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .debt-info h4 {
+            margin: 0 0 4px 0;
+        }
+
+        .debt-info p {
+            margin: 0;
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .debt-amount {
+            font-weight: bold;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+        }
+
+        .delete-debt {
+            background: none;
+            color: var(--error-color);
+            font-size: 1.2rem;
+            padding: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OweTrack</h1>
+            <p class="subtitle">Minimalist debt tracker</p>
+        </header>
+
+        <!-- Auth Section -->
+        <div id="auth-section" class="card">
+            <div class="tabs">
+                <button id="show-login" class="active">Login</button>
+                <button id="show-register">Register</button>
+            </div>
+            <form id="login-form">
+                <input type="text" id="login-username" placeholder="Username" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <form id="register-form" class="hidden">
+                <input type="text" id="register-username" placeholder="Username" required>
+                <input type="password" id="register-password" placeholder="Password" required>
+                <button type="submit">Register</button>
+            </form>
+            <p id="auth-error" class="error"></p>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="hidden">
+            <div class="user-header">
+                <span id="user-display"></span>
+                <button id="logout-btn" class="text-btn">Logout</button>
+            </div>
+
+            <div class="card">
+                <h3>Add New Entry</h3>
+                <form id="debt-form">
+                    <input type="text" id="debtor-name" placeholder="Who owes you?" required>
+                    <input type="number" id="debt-amount" placeholder="Amount" step="0.01" required>
+                    <input type="text" id="debt-description" placeholder="Description (optional)">
+                    <button type="submit">Add Debt</button>
+                </form>
+            </div>
+
+            <div id="debts-container">
+                <h3>Current Debts</h3>
+                <div id="debts-list">
+                    <!-- Debts will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const authSection = document.getElementById('auth-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const showLoginBtn = document.getElementById('show-login');
+        const showRegisterBtn = document.getElementById('show-register');
+        const authError = document.getElementById('auth-error');
+        const userDisplay = document.getElementById('user-display');
+        const logoutBtn = document.getElementById('logout-btn');
+        const debtForm = document.getElementById('debt-form');
+        const debtsList = document.getElementById('debts-list');
+
+        // Simulated Backend using localStorage
+        const getUsers = () => JSON.parse(localStorage.getItem('owetrack_users') || '[]');
+        const saveUsers = (users) => localStorage.setItem('owetrack_users', JSON.stringify(users));
+        const getDebts = () => JSON.parse(localStorage.getItem('owetrack_debts') || '[]');
+        const saveDebts = (debts) => localStorage.setItem('owetrack_debts', JSON.stringify(debts));
+
+        let currentUser = localStorage.getItem('owetrack_current_user');
+
+        // App Initialization
+        if (currentUser) {
+            showDashboard();
+        }
+
+        // Auth Tab Switching
+        showLoginBtn.addEventListener('click', () => {
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            showLoginBtn.classList.add('active');
+            showRegisterBtn.classList.remove('active');
+            authError.textContent = '';
+        });
+
+        showRegisterBtn.addEventListener('click', () => {
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            showLoginBtn.classList.remove('active');
+            showRegisterBtn.classList.add('active');
+            authError.textContent = '';
+        });
+
+        // Login
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            authError.style.color = 'var(--error-color)';
+            const username = document.getElementById('login-username').value;
+            const pass = document.getElementById('login-password').value;
+
+            const users = getUsers();
+            const user = users.find(u => u.username === username && u.password === pass);
+
+            if (user) {
+                currentUser = username;
+                localStorage.setItem('owetrack_current_user', currentUser);
+                showDashboard();
+            } else {
+                authError.textContent = 'Invalid username or password';
+            }
+        });
+
+        // Register
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const pass = document.getElementById('register-password').value;
+
+            const users = getUsers();
+            if (users.find(u => u.username === username)) {
+                authError.textContent = 'Username already exists';
+                return;
+            }
+
+            users.push({ username, password: pass });
+            saveUsers(users);
+
+            authError.style.color = '#bb86fc';
+            authError.textContent = 'Registered! Please login.';
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            showLoginBtn.classList.add('active');
+            showRegisterBtn.classList.remove('active');
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('owetrack_current_user');
+            currentUser = null;
+            dashboardSection.classList.add('hidden');
+            authSection.classList.remove('hidden');
+            loginForm.reset();
+            registerForm.reset();
+        });
+
+        // Dashboard Actions
+        function showDashboard() {
+            authSection.classList.add('hidden');
+            dashboardSection.classList.remove('hidden');
+            userDisplay.textContent = `Hello, ${currentUser}`;
+            loadDebts();
+        }
+
+        function loadDebts() {
+            const allDebts = getDebts();
+            const userDebts = allDebts.filter(d => d.user === currentUser);
+            renderDebts(userDebts);
+        }
+
+        function renderDebts(debts) {
+            debtsList.innerHTML = '';
+            if (debts.length === 0) {
+                debtsList.innerHTML = '<p class="subtitle" style="text-align:center">No debts recorded yet.</p>';
+                return;
+            }
+            debts.sort((a, b) => b.id - a.id).forEach(debt => {
+                const item = document.createElement('div');
+                item.className = 'debt-item';
+                item.innerHTML = `
+                    <div class="debt-info">
+                        <h4>${escapeHtml(debt.debtor_name)}</h4>
+                        <p>${escapeHtml(debt.description || '')}</p>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <span class="debt-amount">₹${parseFloat(debt.amount).toFixed(2)}</span>
+                        <button class="delete-debt" onclick="deleteDebt(${debt.id})">&times;</button>
+                    </div>
+                `;
+                debtsList.appendChild(item);
+            });
+        }
+
+        debtForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('debtor-name').value;
+            const amount = document.getElementById('debt-amount').value;
+            const desc = document.getElementById('debt-description').value;
+
+            const allDebts = getDebts();
+            const newDebt = {
+                id: Date.now(),
+                user: currentUser,
+                debtor_name: name,
+                amount: amount,
+                description: desc
+            };
+
+            allDebts.push(newDebt);
+            saveDebts(allDebts);
+            debtForm.reset();
+            loadDebts();
+        });
+
+        window.deleteDebt = function(id) {
+            if (!confirm('Mark as settled?')) return;
+            let allDebts = getDebts();
+            allDebts = allDebts.filter(d => d.id !== id);
+            saveDebts(allDebts);
+            loadDebts();
+        };
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
