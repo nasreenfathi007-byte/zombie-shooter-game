@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art Editor - Smooth Colour Edition</title>
+    <style>
+        :root {
+            --primary-bg: #fdf6f9;
+            --secondary-bg: #ffffff;
+            --accent-color: #ff85a2;
+            --text-color: #4a4a4a;
+            --border-color: #ffd1dc;
+            --shadow: 0 4px 6px rgba(255, 133, 162, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #app {
+            background-color: var(--secondary-bg);
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--border-color);
+            max-width: 900px;
+            width: 95%;
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 1.5rem;
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--accent-color);
+            font-size: 2.2rem;
+        }
+
+        header p {
+            margin: 0.5rem 0 0;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        main {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .canvas-container {
+            position: relative;
+            background-color: #eee;
+            background-image: linear-gradient(45deg, #ddd 25%, transparent 25%),
+                              linear-gradient(-45deg, #ddd 25%, transparent 25%),
+                              linear-gradient(45deg, transparent 75%, #ddd 75%),
+                              linear-gradient(-45deg, transparent 75%, #ddd 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px 10px, 10px 0;
+            border: 4px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        canvas {
+            display: block;
+            image-rendering: pixelated;
+            cursor: crosshair;
+            touch-action: none;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            min-width: 200px;
+            text-align: left;
+        }
+
+        .tool-section h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.3rem;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .tool-btn {
+            background-color: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        .tool-btn:hover {
+            background-color: var(--primary-bg);
+            border-color: var(--accent-color);
+        }
+
+        .tool-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .color-swatch {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            border: 2px solid rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+
+        .color-swatch.active {
+            border-color: var(--text-color);
+            transform: scale(1.1);
+        }
+
+        .custom-color {
+            grid-column: span 4;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        #colorPicker {
+            flex-grow: 1;
+            height: 40px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2px;
+            cursor: pointer;
+        }
+
+        .actions {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+
+        .secondary-action {
+            background-color: #a0a0a0;
+        }
+
+        .status-bar {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Pixel Art Editor</h1>
+            <p>Made with love for my sister</p>
+        </header>
+        <main>
+            <div class="canvas-container">
+                <canvas id="pixelCanvas" width="480" height="480"></canvas>
+            </div>
+            <div class="sidebar">
+                <div class="tool-section">
+                    <h3>Photo Magic</h3>
+                    <div class="tools-grid">
+                        <button id="cameraBtn" class="tool-btn">📸 Camera</button>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <h3>Tools</h3>
+                    <div class="tools-grid">
+                        <button id="pencilBtn" class="tool-btn active">✏️ Pencil</button>
+                        <button id="eraserBtn" class="tool-btn">🧽 Eraser</button>
+                        <button id="bucketBtn" class="tool-btn">🪣 Bucket</button>
+                        <button id="smoothBtn" class="tool-btn">✨ Smooth</button>
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <h3>Gallery</h3>
+                    <div id="gallery" class="tools-grid">
+                        <!-- Gallery buttons added via JS -->
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <h3>Palette</h3>
+                    <div id="palette" class="palette">
+                        <!-- Swatches added via JS -->
+                    </div>
+                    <div class="custom-color">
+                        <input type="color" id="colorPicker" value="#ff85a2">
+                    </div>
+                </div>
+                <div class="actions">
+                    <button id="clearBtn" class="action-btn secondary-action">Clear Canvas</button>
+                    <button id="downloadBtn" class="action-btn">Save Artwork</button>
+                </div>
+            </div>
+        </main>
+        <div class="status-bar">
+            Tool: <span id="currentToolText">Pencil</span> | Grid: 24x24
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 24;
+        const cellSize = canvas.width / gridSize;
+
+        let pixelData = Array(gridSize).fill().map(() => Array(gridSize).fill(null));
+        let targetData = Array(gridSize).fill().map(() => Array(gridSize).fill(null));
+        let isDrawing = false;
+        let currentTool = 'pencil';
+        let currentColor = '#ff85a2';
+        let smoothPoints = [];
+
+        const ARTWORKS = {
+            'Heart': [
+                {x: 6, y: 7}, {x: 7, y: 7}, {x: 8, y: 7}, {x: 15, y: 7}, {x: 16, y: 7}, {x: 17, y: 7},
+                {x: 5, y: 8}, {x: 6, y: 8}, {x: 7, y: 8}, {x: 8, y: 8}, {x: 9, y: 8}, {x: 14, y: 8}, {x: 15, y: 8}, {x: 16, y: 8}, {x: 17, y: 8}, {x: 18, y: 8},
+                {x: 4, y: 9}, {x: 5, y: 9}, {x: 6, y: 9}, {x: 7, y: 9}, {x: 8, y: 9}, {x: 9, y: 9}, {x: 10, y: 9}, {x: 13, y: 9}, {x: 14, y: 9}, {x: 15, y: 9}, {x: 16, y: 9}, {x: 17, y: 9}, {x: 18, y: 9}, {x: 19, y: 9},
+                {x: 4, y: 10}, {x: 5, y: 10}, {x: 6, y: 10}, {x: 7, y: 10}, {x: 8, y: 10}, {x: 9, y: 10}, {x: 10, y: 10}, {x: 11, y: 10}, {x: 12, y: 10}, {x: 13, y: 10}, {x: 14, y: 10}, {x: 15, y: 10}, {x: 16, y: 10}, {x: 17, y: 10}, {x: 18, y: 10}, {x: 19, y: 10},
+                {x: 4, y: 11}, {x: 5, y: 11}, {x: 6, y: 11}, {x: 7, y: 11}, {x: 8, y: 11}, {x: 9, y: 11}, {x: 10, y: 11}, {x: 11, y: 11}, {x: 12, y: 11}, {x: 13, y: 11}, {x: 14, y: 11}, {x: 15, y: 11}, {x: 16, y: 11}, {x: 17, y: 11}, {x: 18, y: 11}, {x: 19, y: 11},
+                {x: 5, y: 12}, {x: 6, y: 12}, {x: 7, y: 12}, {x: 8, y: 12}, {x: 9, y: 12}, {x: 10, y: 12}, {x: 11, y: 12}, {x: 12, y: 12}, {x: 13, y: 12}, {x: 14, y: 12}, {x: 15, y: 12}, {x: 16, y: 12}, {x: 17, y: 12}, {x: 18, y: 12},
+                {x: 6, y: 13}, {x: 7, y: 13}, {x: 8, y: 13}, {x: 9, y: 13}, {x: 10, y: 13}, {x: 11, y: 13}, {x: 12, y: 13}, {x: 13, y: 13}, {x: 14, y: 13}, {x: 15, y: 13}, {x: 16, y: 13}, {x: 17, y: 13},
+                {x: 7, y: 14}, {x: 8, y: 14}, {x: 9, y: 14}, {x: 10, y: 14}, {x: 11, y: 14}, {x: 12, y: 14}, {x: 13, y: 14}, {x: 14, y: 14}, {x: 15, y: 14}, {x: 16, y: 14},
+                {x: 8, y: 15}, {x: 9, y: 15}, {x: 10, y: 15}, {x: 11, y: 15}, {x: 12, y: 15}, {x: 13, y: 15}, {x: 14, y: 15}, {x: 15, y: 15},
+                {x: 9, y: 16}, {x: 10, y: 16}, {x: 11, y: 16}, {x: 12, y: 16}, {x: 13, y: 16}, {x: 14, y: 16},
+                {x: 10, y: 17}, {x: 11, y: 17}, {x: 12, y: 17}, {x: 13, y: 17},
+                {x: 11, y: 18}, {x: 12, y: 18}
+            ],
+            'Smiley': [
+                {x: 7, y: 6, color: '#000000'}, {x: 8, y: 6, color: '#000000'}, {x: 15, y: 6, color: '#000000'}, {x: 16, y: 6, color: '#000000'},
+                {x: 7, y: 7, color: '#000000'}, {x: 8, y: 7, color: '#000000'}, {x: 15, y: 7, color: '#000000'}, {x: 16, y: 7, color: '#000000'},
+                {x: 5, y: 14, color: '#000000'}, {x: 18, y: 14, color: '#000000'},
+                {x: 6, y: 15, color: '#000000'}, {x: 17, y: 15, color: '#000000'},
+                {x: 7, y: 16, color: '#000000'}, {x: 8, y: 16, color: '#000000'}, {x: 9, y: 16, color: '#000000'}, {x: 10, y: 16, color: '#000000'}, {x: 11, y: 16, color: '#000000'}, {x: 12, y: 16, color: '#000000'}, {x: 13, y: 16, color: '#000000'}, {x: 14, y: 16, color: '#000000'}, {x: 15, y: 16, color: '#000000'}, {x: 16, y: 16, color: '#000000'}
+            ],
+            'Flower': [
+                {x: 11, y: 5, color: '#ff4d6d'}, {x: 12, y: 5, color: '#ff4d6d'}, {x: 10, y: 6, color: '#ff4d6d'}, {x: 11, y: 6, color: '#ff4d6d'}, {x: 12, y: 6, color: '#ff4d6d'}, {x: 13, y: 6, color: '#ff4d6d'}, {x: 11, y: 7, color: '#ff4d6d'}, {x: 12, y: 7, color: '#ff4d6d'},
+                {x: 6, y: 10, color: '#ff4d6d'}, {x: 7, y: 10, color: '#ff4d6d'}, {x: 5, y: 11, color: '#ff4d6d'}, {x: 6, y: 11, color: '#ff4d6d'}, {x: 7, y: 11, color: '#ff4d6d'}, {x: 8, y: 11, color: '#ff4d6d'}, {x: 6, y: 12, color: '#ff4d6d'}, {x: 7, y: 12, color: '#ff4d6d'},
+                {x: 16, y: 10, color: '#ff4d6d'}, {x: 17, y: 10, color: '#ff4d6d'}, {x: 15, y: 11, color: '#ff4d6d'}, {x: 16, y: 11, color: '#ff4d6d'}, {x: 17, y: 11, color: '#ff4d6d'}, {x: 18, y: 11, color: '#ff4d6d'}, {x: 16, y: 12, color: '#ff4d6d'}, {x: 17, y: 12, color: '#ff4d6d'},
+                {x: 11, y: 15, color: '#ff4d6d'}, {x: 12, y: 15, color: '#ff4d6d'}, {x: 10, y: 16, color: '#ff4d6d'}, {x: 11, y: 16, color: '#ff4d6d'}, {x: 12, y: 16, color: '#ff4d6d'}, {x: 13, y: 16, color: '#ff4d6d'}, {x: 11, y: 17, color: '#ff4d6d'}, {x: 12, y: 17, color: '#ff4d6d'},
+                {x: 11, y: 11, color: '#ffff00'}, {x: 12, y: 11, color: '#ffff00'}, {x: 11, y: 12, color: '#ffff00'}, {x: 12, y: 12, color: '#ffff00'}
+            ],
+            'Cat': [
+                {x: 6, y: 5, color: '#4a4a4a'}, {x: 17, y: 5, color: '#4a4a4a'}, {x: 6, y: 6, color: '#4a4a4a'}, {x: 17, y: 6, color: '#4a4a4a'}, {x: 6, y: 7, color: '#4a4a4a'}, {x: 17, y: 7, color: '#4a4a4a'},
+                {x: 5, y: 8, color: '#4a4a4a'}, {x: 6, y: 8, color: '#4a4a4a'}, {x: 7, y: 8, color: '#4a4a4a'}, {x: 16, y: 8, color: '#4a4a4a'}, {x: 17, y: 8, color: '#4a4a4a'}, {x: 18, y: 8, color: '#4a4a4a'},
+                {x: 4, y: 9, color: '#4a4a4a'}, {x: 19, y: 9, color: '#4a4a4a'}, {x: 4, y: 10, color: '#4a4a4a'}, {x: 19, y: 10, color: '#4a4a4a'}, {x: 4, y: 11, color: '#4a4a4a'}, {x: 19, y: 11, color: '#4a4a4a'},
+                {x: 7, y: 11, color: '#000000'}, {x: 16, y: 11, color: '#000000'}, {x: 8, y: 12, color: '#4a4a4a'}, {x: 15, y: 12, color: '#4a4a4a'}, {x: 9, y: 13, color: '#4a4a4a'}, {x: 10, y: 13, color: '#4a4a4a'}, {x: 11, y: 13, color: '#4a4a4a'}, {x: 12, y: 13, color: '#4a4a4a'}, {x: 13, y: 13, color: '#4a4a4a'}, {x: 14, y: 13, color: '#4a4a4a'}
+            ],
+            'Star': [
+                {x: 12, y: 3, color: '#ffff00'}, {x: 11, y: 4, color: '#ffff00'}, {x: 12, y: 4, color: '#ffff00'}, {x: 13, y: 4, color: '#ffff00'},
+                {x: 10, y: 5, color: '#ffff00'}, {x: 11, y: 5, color: '#ffff00'}, {x: 12, y: 5, color: '#ffff00'}, {x: 13, y: 5, color: '#ffff00'}, {x: 14, y: 5, color: '#ffff00'},
+                {x: 4, y: 6, color: '#ffff00'}, {x: 5, y: 6, color: '#ffff00'}, {x: 6, y: 6, color: '#ffff00'}, {x: 7, y: 6, color: '#ffff00'}, {x: 8, y: 6, color: '#ffff00'}, {x: 9, y: 6, color: '#ffff00'}, {x: 10, y: 6, color: '#ffff00'}, {x: 11, y: 6, color: '#ffff00'}, {x: 12, y: 6, color: '#ffff00'}, {x: 13, y: 6, color: '#ffff00'}, {x: 14, y: 6, color: '#ffff00'}, {x: 15, y: 6, color: '#ffff00'}, {x: 16, y: 6, color: '#ffff00'}, {x: 17, y: 6, color: '#ffff00'}, {x: 18, y: 6, color: '#ffff00'}, {x: 19, y: 6, color: '#ffff00'}, {x: 20, y: 6, color: '#ffff00'},
+                {x: 7, y: 7, color: '#ffff00'}, {x: 8, y: 7, color: '#ffff00'}, {x: 9, y: 7, color: '#ffff00'}, {x: 10, y: 7, color: '#ffff00'}, {x: 11, y: 7, color: '#ffff00'}, {x: 12, y: 7, color: '#ffff00'}, {x: 13, y: 7, color: '#ffff00'}, {x: 14, y: 7, color: '#ffff00'}, {x: 15, y: 7, color: '#ffff00'}, {x: 16, y: 7, color: '#ffff00'}, {x: 17, y: 7, color: '#ffff00'},
+                {x: 8, y: 8, color: '#ffff00'}, {x: 9, y: 8, color: '#ffff00'}, {x: 10, y: 8, color: '#ffff00'}, {x: 11, y: 8, color: '#ffff00'}, {x: 12, y: 8, color: '#ffff00'}, {x: 13, y: 8, color: '#ffff00'}, {x: 14, y: 8, color: '#ffff00'}, {x: 15, y: 8, color: '#ffff00'}, {x: 16, y: 8, color: '#ffff00'},
+                {x: 9, y: 9, color: '#ffff00'}, {x: 10, y: 9, color: '#ffff00'}, {x: 11, y: 9, color: '#ffff00'}, {x: 12, y: 9, color: '#ffff00'}, {x: 13, y: 9, color: '#ffff00'}, {x: 14, y: 9, color: '#ffff00'}, {x: 15, y: 9, color: '#ffff00'},
+                {x: 8, y: 10, color: '#ffff00'}, {x: 9, y: 10, color: '#ffff00'}, {x: 10, y: 10, color: '#ffff00'}, {x: 11, y: 10, color: '#ffff00'}, {x: 12, y: 10, color: '#ffff00'}, {x: 13, y: 10, color: '#ffff00'}, {x: 14, y: 10, color: '#ffff00'}, {x: 15, y: 10, color: '#ffff00'}, {x: 16, y: 10, color: '#ffff00'},
+                {x: 7, y: 11, color: '#ffff00'}, {x: 17, y: 11, color: '#ffff00'}, {x: 6, y: 12, color: '#ffff00'}, {x: 18, y: 12, color: '#ffff00'}, {x: 5, y: 13, color: '#ffff00'}, {x: 19, y: 13, color: '#ffff00'}
+            ],
+            'Sun': [
+                {x: 11, y: 9, color: '#ffff00'}, {x: 12, y: 9, color: '#ffff00'}, {x: 13, y: 9, color: '#ffff00'},
+                {x: 10, y: 10, color: '#ffff00'}, {x: 11, y: 10, color: '#ffff00'}, {x: 12, y: 10, color: '#ffff00'}, {x: 13, y: 10, color: '#ffff00'}, {x: 14, y: 10, color: '#ffff00'},
+                {x: 9, y: 11, color: '#ffff00'}, {x: 10, y: 11, color: '#ffff00'}, {x: 11, y: 11, color: '#ffff00'}, {x: 12, y: 11, color: '#ffff00'}, {x: 13, y: 11, color: '#ffff00'}, {x: 14, y: 11, color: '#ffff00'}, {x: 15, y: 11, color: '#ffff00'},
+                {x: 9, y: 12, color: '#ffff00'}, {x: 10, y: 12, color: '#ffff00'}, {x: 11, y: 12, color: '#ffff00'}, {x: 12, y: 12, color: '#ffff00'}, {x: 13, y: 12, color: '#ffff00'}, {x: 14, y: 12, color: '#ffff00'}, {x: 15, y: 12, color: '#ffff00'},
+                {x: 9, y: 13, color: '#ffff00'}, {x: 10, y: 13, color: '#ffff00'}, {x: 11, y: 13, color: '#ffff00'}, {x: 12, y: 13, color: '#ffff00'}, {x: 13, y: 13, color: '#ffff00'}, {x: 14, y: 13, color: '#ffff00'}, {x: 15, y: 13, color: '#ffff00'},
+                {x: 10, y: 14, color: '#ffff00'}, {x: 11, y: 14, color: '#ffff00'}, {x: 12, y: 14, color: '#ffff00'}, {x: 13, y: 14, color: '#ffff00'}, {x: 14, y: 14, color: '#ffff00'},
+                {x: 11, y: 15, color: '#ffff00'}, {x: 12, y: 15, color: '#ffff00'}, {x: 13, y: 15, color: '#ffff00'},
+                {x: 12, y: 6, color: '#ff9f1c'}, {x: 12, y: 7, color: '#ff9f1c'},
+                {x: 12, y: 17, color: '#ff9f1c'}, {x: 12, y: 18, color: '#ff9f1c'},
+                {x: 6, y: 12, color: '#ff9f1c'}, {x: 7, y: 12, color: '#ff9f1c'},
+                {x: 17, y: 12, color: '#ff9f1c'}, {x: 18, y: 12, color: '#ff9f1c'},
+                {x: 8, y: 8, color: '#ff9f1c'}, {x: 9, y: 9, color: '#ff9f1c'},
+                {x: 15, y: 9, color: '#ff9f1c'}, {x: 16, y: 8, color: '#ff9f1c'},
+                {x: 8, y: 16, color: '#ff9f1c'}, {x: 9, y: 15, color: '#ff9f1c'},
+                {x: 15, y: 15, color: '#ff9f1c'}, {x: 16, y: 16, color: '#ff9f1c'}
+            ]
+        };
+
+        function init() {
+            render();
+            setupTools();
+            setupPalette();
+            setupGallery();
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const palette = getPaletteColors();
+
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    if (pixelData[y][x]) {
+                        ctx.fillStyle = pixelData[y][x];
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    } else if (targetData[y][x]) {
+                        // Color by Number: Show number
+                        const colorIndex = palette.indexOf(targetData[y][x].toLowerCase());
+                        if (colorIndex !== -1) {
+                            const isSelectedColor = targetData[y][x].toLowerCase() === currentColor.toLowerCase();
+
+                            // Highlight if matches current color
+                            if (isSelectedColor) {
+                                ctx.fillStyle = 'rgba(255, 133, 162, 0.2)';
+                                ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                            }
+
+                            ctx.fillStyle = isSelectedColor ? '#ff85a2' : '#bbb';
+                            ctx.font = `${cellSize * 0.5}px Arial`;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(colorIndex + 1, x * cellSize + cellSize / 2, y * cellSize + cellSize / 2);
+                        }
+                    }
+                }
+            }
+            drawGridLines();
+
+            // Highlight smooth points
+            smoothPoints.forEach(p => {
+                ctx.strokeStyle = '#ff85a2';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(p.x * cellSize, p.y * cellSize, cellSize, cellSize);
+            });
+        }
+
+        function drawGridLines() {
+            ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= gridSize; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * cellSize, 0);
+                ctx.lineTo(i * cellSize, canvas.height);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(0, i * cellSize);
+                ctx.lineTo(canvas.width, i * cellSize);
+                ctx.stroke();
+            }
+        }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        window.addEventListener('mouseup', stopDrawing);
+
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: Math.floor((e.clientX - rect.left) / cellSize),
+                y: Math.floor((e.clientY - rect.top) / cellSize)
+            };
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            handleAction(e);
+        }
+
+        function draw(e) {
+            if (isDrawing) handleAction(e);
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function handleAction(e) {
+            const pos = getMousePos(e);
+            if (pos.x < 0 || pos.x >= gridSize || pos.y < 0 || pos.y >= gridSize) return;
+
+            if (currentTool === 'pencil') {
+                if (validateMove(pos.x, pos.y, currentColor)) {
+                    pixelData[pos.y][pos.x] = currentColor;
+                    render();
+                    triggerSuccessEffect(pos.x, pos.y);
+                } else {
+                    render();
+                }
+            } else if (currentTool === 'eraser') {
+                pixelData[pos.y][pos.x] = null;
+                render();
+            } else if (currentTool === 'bucket' && e.type === 'mousedown') {
+                if (validateMove(pos.x, pos.y, currentColor)) {
+                    floodFill(pos.x, pos.y, pixelData[pos.y][pos.x], currentColor);
+                    render();
+                    triggerSuccessEffect(pos.x, pos.y);
+                } else {
+                    render();
+                }
+            } else if (currentTool === 'smooth' && e.type === 'mousedown') {
+                handleSmoothTool(pos);
+            }
+        }
+
+        function validateMove(x, y, color) {
+            // If there's target data, only allow coloring if it matches the target
+            const isNoTarget = targetData.every(row => row.every(cell => cell === null));
+            if (isNoTarget) return true;
+
+            return targetData[y][x] && targetData[y][x].toLowerCase() === color.toLowerCase();
+        }
+
+        function triggerSuccessEffect(x, y) {
+            // Simple visual feedback: quickly draw a larger rectangle
+            ctx.fillStyle = 'white';
+            ctx.globalAlpha = 0.8;
+            ctx.fillRect(x * cellSize - 2, y * cellSize - 2, cellSize + 4, cellSize + 4);
+            ctx.globalAlpha = 1.0;
+
+            // Re-render after a short delay to clear the flash
+            setTimeout(() => render(), 50);
+        }
+
+        function floodFill(startX, startY, targetColor, replacementColor) {
+            if (targetColor === replacementColor) return;
+            const stack = [[startX, startY]];
+            while (stack.length > 0) {
+                const [x, y] = stack.pop();
+                if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) continue;
+                if (pixelData[y][x] === targetColor) {
+                    pixelData[y][x] = replacementColor;
+                    stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+                }
+            }
+        }
+
+        function handleSmoothTool(pos) {
+            smoothPoints.push(pos);
+            if (smoothPoints.length === 2) {
+                createGradient(smoothPoints[0], smoothPoints[1]);
+                smoothPoints = [];
+            }
+            render();
+        }
+
+        function createGradient(p1, p2) {
+            // Refinement: allow starting from canvas color OR using current color
+            const startColor = pixelData[p1.y][p1.x];
+            const color1 = hexToRgb(startColor || '#ffffff');
+            const color2 = hexToRgb(currentColor);
+
+            const dx = Math.abs(p2.x - p1.x);
+            const dy = Math.abs(p2.y - p1.y);
+            const steps = Math.max(dx, dy);
+
+            for (let i = 0; i <= steps; i++) {
+                const t = steps === 0 ? 0 : i / steps;
+                const x = Math.round(p1.x + t * (p2.x - p1.x));
+                const y = Math.round(p1.y + t * (p2.y - p1.y));
+
+                const r = Math.round(color1.r + t * (color2.r - color1.r));
+                const g = Math.round(color1.g + t * (color2.g - color1.g));
+                const b = Math.round(color1.b + t * (color2.b - color1.b));
+
+                if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
+                    pixelData[y][x] = rgbToHex(r, g, b);
+                }
+            }
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 255, g: 255, b: 255 };
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        function setupTools() {
+            const buttons = {
+                'pencil': document.getElementById('pencilBtn'),
+                'eraser': document.getElementById('eraserBtn'),
+                'bucket': document.getElementById('bucketBtn'),
+                'smooth': document.getElementById('smoothBtn')
+            };
+
+            const toolText = document.getElementById('currentToolText');
+
+            Object.entries(buttons).forEach(([tool, btn]) => {
+                btn.onclick = () => {
+                    currentTool = tool;
+                    Object.values(buttons).forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    toolText.textContent = tool.charAt(0).toUpperCase() + tool.slice(1);
+
+                    // Reset smooth tool selection if switching away
+                    if (tool !== 'smooth') {
+                        smoothPoints = [];
+                        render();
+                    }
+                };
+            });
+
+            const cameraBtn = document.getElementById('cameraBtn');
+            const imageInput = document.getElementById('imageInput');
+
+            cameraBtn.onclick = () => imageInput.click();
+            imageInput.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file && confirm('Transform this photo into a pixel puzzle?')) {
+                    processImage(file);
+                }
+            };
+
+            document.getElementById('clearBtn').onclick = () => {
+                if (confirm('Are you sure you want to clear your beautiful artwork?')) {
+                    pixelData = Array(gridSize).fill().map(() => Array(gridSize).fill(null));
+                    render();
+                }
+            };
+
+            document.getElementById('downloadBtn').onclick = () => {
+                const link = document.createElement('a');
+                link.download = 'pixel-art.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            };
+        }
+
+        function getPaletteColors() {
+            return [
+                '#000000', '#ffffff', '#4a4a4a', '#a0a0a0',
+                '#ff85a2', '#ff4d6d', '#ff0000', '#ff9f1c',
+                '#ffff00', '#9ef01a', '#00ff00', '#2ec4b6',
+                '#00ffff', '#00b4d8', '#0000ff', '#7209b7',
+                '#ff00ff', '#f15bb5', '#9d4edd', '#ffd1dc'
+            ];
+        }
+
+        function setupPalette() {
+            const colors = getPaletteColors();
+            const paletteEl = document.getElementById('palette');
+            colors.forEach(c => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                if (c === currentColor) swatch.classList.add('active');
+                swatch.style.backgroundColor = c;
+                swatch.onclick = () => {
+                    currentColor = c;
+                    document.getElementById('colorPicker').value = c;
+                    updateActiveSwatch(swatch);
+                };
+                paletteEl.appendChild(swatch);
+            });
+
+            document.getElementById('colorPicker').oninput = (e) => {
+                currentColor = e.target.value;
+                updateActiveSwatch(null);
+            };
+        }
+
+        function updateActiveSwatch(activeSwatch) {
+            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            if (activeSwatch) activeSwatch.classList.add('active');
+        }
+
+        function setupGallery() {
+            const galleryEl = document.getElementById('gallery');
+            Object.keys(ARTWORKS).forEach(name => {
+                const btn = document.createElement('button');
+                btn.className = 'tool-btn';
+                btn.textContent = name;
+                btn.onclick = () => loadArtwork(name);
+                galleryEl.appendChild(btn);
+            });
+        }
+
+        function loadArtwork(name) {
+            if (confirm(`Load ${name}? This will create a "Color by Number" puzzle for you!`)) {
+                pixelData = Array(gridSize).fill().map(() => Array(gridSize).fill(null));
+                targetData = Array(gridSize).fill().map(() => Array(gridSize).fill(null));
+
+                ARTWORKS[name].forEach(p => {
+                    targetData[p.y][p.x] = p.color || '#ff85a2'; // Default target to pink
+                });
+                render();
+            }
+        }
+
+        function processImage(file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = gridSize;
+                    tempCanvas.height = gridSize;
+                    const tempCtx = tempCanvas.getContext('2d');
+
+                    // Square Crop
+                    let srcX = 0, srcY = 0, srcW = img.width, srcH = img.height;
+                    if (img.width > img.height) {
+                        srcW = img.height;
+                        srcX = (img.width - img.height) / 2;
+                    } else {
+                        srcH = img.width;
+                        srcY = (img.height - img.width) / 2;
+                    }
+
+                    tempCtx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, gridSize, gridSize);
+
+                    const imgData = tempCtx.getImageData(0, 0, gridSize, gridSize).data;
+                    const palette = getPaletteColors().map(hexToRgb);
+
+                    pixelData = Array(gridSize).fill().map(() => Array(gridSize).fill(null));
+                    targetData = Array(gridSize).fill().map(() => Array(gridSize).fill(null));
+
+                    for (let i = 0; i < imgData.length; i += 4) {
+                        const r = imgData[i];
+                        const g = imgData[i + 1];
+                        const b = imgData[i + 2];
+                        const a = imgData[i + 3];
+
+                        if (a < 128) continue; // Skip transparent
+
+                        const closestColor = findClosestPaletteColor({r, g, b}, palette);
+                        const x = (i / 4) % gridSize;
+                        const y = Math.floor((i / 4) / gridSize);
+                        targetData[y][x] = rgbToHex(closestColor.r, closestColor.g, closestColor.b);
+                    }
+                    render();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function findClosestPaletteColor(rgb, palette) {
+            let minDistance = Infinity;
+            let closest = palette[0];
+
+            palette.forEach(p => {
+                const d = Math.sqrt(
+                    Math.pow(rgb.r - p.r, 2) +
+                    Math.pow(rgb.g - p.g, 2) +
+                    Math.pow(rgb.b - p.b, 2)
+                );
+                if (d < minDistance) {
+                    minDistance = d;
+                    closest = p;
+                }
+            });
+            return closest;
+        }
+
+        init();
+    </script>
+</body>
+</html>
