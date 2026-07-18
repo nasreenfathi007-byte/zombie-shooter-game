@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HYPE BOT 3000 - Conversational Hype Chatbot & Synthesizer</title>
+  <title>HYPE BOT 3000 - Conversational Hype Chatbot & Soundboard</title>
   <style>
     /* Premium CSS Variables for Theme Management */
     :root {
@@ -18,10 +18,6 @@
       --shadow-color: rgba(0, 0, 0, 0.6);
       --glow-intensity: 0 0 15px rgba(168, 85, 247, 0.45);
       --glass-blur: blur(16px);
-      --keyboard-white: #ffffff;
-      --keyboard-white-active: #e2e8f0;
-      --keyboard-black: #0f172a;
-      --keyboard-black-active: #334155;
       --transition-speed: 0.3s;
       --user-bubble-bg: rgba(255, 255, 255, 0.07);
       --bot-bubble-bg: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(6, 182, 212, 0.15));
@@ -38,10 +34,6 @@
       --accent-tertiary: #db2777;
       --shadow-color: rgba(0, 0, 0, 0.08);
       --glow-intensity: 0 0 12px rgba(139, 92, 246, 0.2);
-      --keyboard-white: #f9fafb;
-      --keyboard-white-active: #d1d5db;
-      --keyboard-black: #1f2937;
-      --keyboard-black-active: #4b5563;
       --user-bubble-bg: rgba(0, 0, 0, 0.05);
       --bot-bubble-bg: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(8, 145, 178, 0.1));
     }
@@ -78,7 +70,7 @@
 
     @media (min-width: 1024px) {
       .container {
-        grid-template-columns: 1.25fr 0.75fr;
+        grid-template-columns: 1.3fr 0.7fr;
       }
     }
 
@@ -449,7 +441,7 @@
       transform: translateY(-1px);
     }
 
-    /* Right Column: soundboard / Synth keyboard */
+    /* Right Column: soundboard */
     .widget-panel {
       display: flex;
       flex-direction: column;
@@ -465,12 +457,12 @@
 
     .pads-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
     }
 
     .pad {
-      height: 58px;
+      height: 70px;
       border-radius: 12px;
       border: 1px solid var(--card-border);
       background: rgba(255, 255, 255, 0.02);
@@ -485,16 +477,16 @@
     }
 
     .pad-label {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: 700;
     }
 
     .pad-key {
-      font-size: 0.55rem;
+      font-size: 0.6rem;
       color: var(--text-muted);
-      margin-top: 3px;
+      margin-top: 5px;
       background: rgba(0, 0, 0, 0.25);
-      padding: 1px 4px;
+      padding: 1px 6px;
       border-radius: 4px;
       font-weight: bold;
     }
@@ -503,10 +495,6 @@
     .pad-1 { border-left: 3px solid var(--accent-tertiary); }
     .pad-2 { border-left: 3px solid var(--accent-primary); }
     .pad-3 { border-left: 3px solid var(--accent-secondary); }
-    .pad-4 { border-left: 3px solid #10b981; }
-    .pad-5 { border-left: 3px solid #f59e0b; }
-    .pad-6 { border-left: 3px solid #3b82f6; }
-    .pad-7 { border-left: 3px solid #ec4899; }
 
     .pad:hover {
       background: rgba(255, 255, 255, 0.06);
@@ -518,135 +506,6 @@
       background: var(--accent-primary);
       border-color: transparent;
       box-shadow: var(--glow-intensity);
-    }
-
-    /* Synthesizer Keyboard Section */
-    .keyboard-section {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .synth-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .wave-picker {
-      display: flex;
-      background: rgba(0, 0, 0, 0.15);
-      border-radius: 8px;
-      padding: 2px;
-      border: 1px solid var(--card-border);
-    }
-
-    .wave-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: all 0.2s;
-    }
-
-    .wave-btn.active {
-      background: var(--accent-primary);
-      color: #ffffff;
-    }
-
-    /* Realistic Piano Keys UI */
-    .piano-keys-wrapper {
-      position: relative;
-      height: 150px;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      padding: 6px;
-      border: 1px solid var(--card-border);
-      display: flex;
-      justify-content: center;
-    }
-
-    .piano-keyboard {
-      display: flex;
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-
-    .piano-key {
-      flex: 1;
-      height: 100%;
-      border-radius: 0 0 6px 6px;
-      position: relative;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: center;
-      padding-bottom: 8px;
-      font-weight: 700;
-      font-size: 0.65rem;
-      user-select: none;
-      transition: background 0.1s, transform 0.1s;
-    }
-
-    .piano-key.white-key {
-      background: var(--keyboard-white);
-      color: #1f2937;
-      border: 1px solid #d1d5db;
-      z-index: 1;
-    }
-
-    .piano-key.white-key:hover {
-      background: #f3f4f6;
-    }
-
-    .piano-key.white-key.active {
-      background: var(--keyboard-white-active);
-      transform: translateY(2px);
-    }
-
-    .piano-key.black-key {
-      background: var(--keyboard-black);
-      color: #ffffff;
-      height: 60%;
-      width: 8%;
-      position: absolute;
-      z-index: 2;
-      margin-left: -4%;
-      border-radius: 0 0 4px 4px;
-    }
-
-    .piano-key.black-key:hover {
-      background: #374151;
-    }
-
-    .piano-key.black-key.active {
-      background: var(--keyboard-black-active);
-      transform: translateY(2px);
-    }
-
-    /* Positioning black keys correctly on absolute offset */
-    .black-key-c-sharp { left: 14.3%; }
-    .black-key-d-sharp { left: 28.6%; }
-    .black-key-f-sharp { left: 57.1%; }
-    .black-key-g-sharp { left: 71.4%; }
-    .black-key-a-sharp { left: 85.7%; }
-
-    .piano-key span {
-      pointer-events: none;
-    }
-
-    .key-bind {
-      font-size: 0.55rem;
-      color: var(--text-muted);
-      margin-top: 1px;
-      font-weight: bold;
     }
 
     /* Footer Details */
@@ -710,7 +569,7 @@
       </div>
       <div class="brand-title">
         <h1>HYPE BOT 3000</h1>
-        <p>Conversational Hype Chatbot & Dynamic Soundboard Synthesizer</p>
+        <p>Conversational Hype Chatbot & Dynamic Soundboard</p>
       </div>
     </div>
     <div class="header-actions">
@@ -757,7 +616,7 @@
         <div class="chat-stream" id="chatStream">
           <div class="message-bubble message-bot">
             <div class="bubble-sender">HYPE BOT</div>
-            Hey friend! Welcome to HYPE BOT 3000! Drop an achievement, score, or goal you accomplished today. Use the synthesizer and soundboard to add custom backbeats!
+            Hey friend! Welcome to HYPE BOT 3000! Drop an achievement, score, or goal you accomplished today. Use the soundboard keys to trigger awesome sounds!
           </div>
         </div>
 
@@ -787,12 +646,12 @@
       </div>
     </main>
 
-    <!-- Right Column: soundboard / Synth keyboard -->
+    <!-- Right Column: soundboard -->
     <aside class="panel">
       <div class="panel-header">
         <div class="panel-title">
           <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-          SOUNDBOARD & SYNTH
+          SOUNDBOARD
         </div>
       </div>
 
@@ -800,7 +659,7 @@
 
         <!-- Interactive Soundboard Pads -->
         <div class="soundboard-section">
-          <div class="chips-title" style="margin-bottom: 6px;">SOUNDBOARD SFX (Q - U)</div>
+          <div class="chips-title" style="margin-bottom: 6px;">SOUNDBOARD SFX (Q - E)</div>
           <div class="pads-grid" id="padsGrid">
             <button class="pad pad-1" data-pad="0" onclick="triggerSFX('airhorn')">
               <span class="pad-label">Airhorn</span>
@@ -814,92 +673,6 @@
               <span class="pad-label">Bass Drop</span>
               <span class="pad-key">E</span>
             </button>
-            <button class="pad pad-4" data-pad="3" onclick="triggerSFX('kick')">
-              <span class="pad-label">Kick</span>
-              <span class="pad-key">R</span>
-            </button>
-            <button class="pad pad-5" data-pad="4" onclick="triggerSFX('snare')">
-              <span class="pad-label">Snare</span>
-              <span class="pad-key">T</span>
-            </button>
-            <button class="pad pad-6" data-pad="5" onclick="triggerSFX('hihat')">
-              <span class="pad-label">Hi-Hat</span>
-              <span class="pad-key">Y</span>
-            </button>
-            <button class="pad pad-7" data-pad="6" onclick="triggerSFX('cowbell')">
-              <span class="pad-label">Cowbell</span>
-              <span class="pad-key">U</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Piano Synth Keyboard -->
-        <div class="keyboard-section">
-          <div class="synth-header-row">
-            <div class="chips-title">SYNTH INSTRUMENT (A - K)</div>
-            <div class="wave-picker">
-              <button class="wave-btn active" data-wave="sine" onclick="setWaveType('sine')">Sine</button>
-              <button class="wave-btn" data-wave="triangle" onclick="setWaveType('triangle')">Tri</button>
-              <button class="wave-btn" data-wave="sawtooth" onclick="setWaveType('sawtooth')">Saw</button>
-              <button class="wave-btn" data-wave="square" onclick="setWaveType('square')">Square</button>
-            </div>
-          </div>
-
-          <div class="piano-keys-wrapper">
-            <div class="piano-keyboard" id="pianoKeyboard">
-              <div class="piano-key white-key" data-note="261.63" data-note-bind="A">
-                <span>C4</span>
-                <span class="key-bind">A</span>
-              </div>
-              <div class="piano-key black-key black-key-c-sharp" data-note="277.18" data-note-bind="S">
-                <span>C#4</span>
-                <span class="key-bind">S</span>
-              </div>
-              <div class="piano-key white-key" data-note="293.66" data-note-bind="D">
-                <span>D4</span>
-                <span class="key-bind">D</span>
-              </div>
-              <div class="piano-key black-key black-key-d-sharp" data-note="311.13" data-note-bind="F">
-                <span>D#4</span>
-                <span class="key-bind">F</span>
-              </div>
-              <div class="piano-key white-key" data-note="329.63" data-note-bind="G">
-                <span>E4</span>
-                <span class="key-bind">G</span>
-              </div>
-              <div class="piano-key white-key" data-note="349.23" data-note-bind="H">
-                <span>F4</span>
-                <span class="key-bind">H</span>
-              </div>
-              <div class="piano-key black-key black-key-f-sharp" data-note="369.99" data-note-bind="I">
-                <span>F#4</span>
-                <span class="key-bind">I</span>
-              </div>
-              <div class="piano-key white-key" data-note="392.00" data-note-bind="J">
-                <span>G4</span>
-                <span class="key-bind">J</span>
-              </div>
-              <div class="piano-key black-key black-key-g-sharp" data-note="415.30" data-note-bind="O">
-                <span>G#4</span>
-                <span class="key-bind">O</span>
-              </div>
-              <div class="piano-key white-key" data-note="440.00" data-note-bind="K">
-                <span>A4</span>
-                <span class="key-bind">K</span>
-              </div>
-              <div class="piano-key black-key black-key-a-sharp" data-note="466.16" data-note-bind="P">
-                <span>A#4</span>
-                <span class="key-bind">P</span>
-              </div>
-              <div class="piano-key white-key" data-note="493.88" data-note-bind="L">
-                <span>B4</span>
-                <span class="key-bind">L</span>
-              </div>
-              <div class="piano-key white-key" data-note="523.25" data-note-bind="SEMICOLON">
-                <span>C5</span>
-                <span class="key-bind">;</span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -911,7 +684,7 @@
   <!-- App Footer -->
   <footer>
     <p>🤖 Conversational Hype Bot 3000 online and fully responsive 🤖</p>
-    <p>Keyboard triggers: Soundboard (Q, W, E, R, T, Y, U) • Synth Keyboard (A, S, D, F, G, H, I, J, O, K, P, L, ;)</p>
+    <p>Keyboard triggers: Soundboard (Q, W, E)</p>
   </footer>
 
   <script>
@@ -938,14 +711,13 @@
         themeIcon.innerHTML = `<path d="M12.1 22c-5.5 0-10-4.5-10-10 0-4.8 3.5-8.9 8.2-9.8.5-.1 1 .3.9.8-.1.4-.4.8-.8 1C8.1 4.9 6.6 7.2 6.6 10c0 4.1 3.3 7.4 7.4 7.4 2.8 0 5.1-1.5 6.1-3.8.2-.4.6-.7 1-.8.6-.1 1 .4.8.9-.9 4.7-5 8.3-9.8 8.3z"/>`;
       } else {
         themeText.textContent = "Light Mode";
-        themeIcon.innerHTML = `<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.38-.38.38-1.02 0-1.41z"/>`;
+        themeIcon.innerHTML = `<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.38-.38.38-1.02 0-1.41z"/>`;
       }
     }
 
 
-    // --- 2. WEB AUDIO API SYNTHESIZER ---
+    // --- 2. WEB AUDIO API ---
     let audioCtx = null;
-    let waveType = 'sine';
 
     function initAudio() {
       if (!audioCtx) {
@@ -954,14 +726,6 @@
       if (audioCtx.state === 'suspended') {
         audioCtx.resume();
       }
-    }
-
-    function setWaveType(type) {
-      initAudio();
-      waveType = type;
-      document.querySelectorAll('.wave-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-wave') === type);
-      });
     }
 
     // Dynamic Visualizer Bars
@@ -997,38 +761,13 @@
     }
 
 
-    // --- 3. PREMIUM SYNTH INSTRUMENTS / SFX ---
-    function playNote(freq) {
-      initAudio();
-      const osc = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-
-      osc.type = waveType;
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-
-      gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.35, audioCtx.currentTime + 0.05); // Attack
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2); // Decay/Sustain
-
-      osc.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 1.2);
-
-      pulseVisualizer(true, 300);
-    }
-
+    // --- 3. PREMIUM SOUND EFFECTS ---
     function triggerSFX(type) {
       initAudio();
       switch(type) {
         case 'airhorn': playAirhorn(); break;
         case 'scratch': playScratch(); break;
         case 'bassdrop': playBassDrop(); break;
-        case 'kick': playKick(); break;
-        case 'snare': playSnare(); break;
-        case 'hihat': playHihat(); break;
-        case 'cowbell': playCowbell(); break;
       }
     }
 
@@ -1057,7 +796,6 @@
       pulseVisualizer(true, 800);
     }
 
-    // Scratch Scratch Sound
     function playScratch() {
       const duration = 0.45;
       const osc = audioCtx.createOscillator();
@@ -1104,123 +842,6 @@
       osc.start();
       osc.stop(audioCtx.currentTime + duration);
       pulseVisualizer(true, 1800);
-    }
-
-    function playKick() {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-
-      gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.3);
-      pulseVisualizer(true, 250);
-    }
-
-    function playSnare() {
-      const bufferSize = audioCtx.sampleRate * 0.2;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-
-      const noiseNode = audioCtx.createBufferSource();
-      noiseNode.buffer = buffer;
-
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'highpass';
-      filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
-
-      const noiseGain = audioCtx.createGain();
-      noiseGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-
-      noiseNode.connect(filter);
-      filter.connect(noiseGain);
-      noiseGain.connect(audioCtx.destination);
-
-      const osc = audioCtx.createOscillator();
-      const oscGain = audioCtx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-
-      oscGain.gain.setValueAtTime(0.18, audioCtx.currentTime);
-      oscGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-
-      osc.connect(oscGain);
-      oscGain.connect(audioCtx.destination);
-
-      noiseNode.start();
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.2);
-      pulseVisualizer(true, 200);
-    }
-
-    function playHihat() {
-      const bufferSize = audioCtx.sampleRate * 0.08;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-
-      const source = audioCtx.createBufferSource();
-      source.buffer = buffer;
-
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(9500, audioCtx.currentTime);
-
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-
-      source.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      source.start();
-      pulseVisualizer(true, 80);
-    }
-
-    function playCowbell() {
-      const osc1 = audioCtx.createOscillator();
-      const osc2 = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      const filter = audioCtx.createBiquadFilter();
-
-      osc1.type = 'square';
-      osc2.type = 'square';
-
-      osc1.frequency.setValueAtTime(800, audioCtx.currentTime);
-      osc2.frequency.setValueAtTime(540, audioCtx.currentTime);
-
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
-
-      gain.gain.setValueAtTime(0, audioCtx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
-
-      osc1.connect(filter);
-      osc2.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc1.start();
-      osc2.start();
-      osc1.stop(audioCtx.currentTime + 0.35);
-      osc2.stop(audioCtx.currentTime + 0.35);
-      pulseVisualizer(true, 200);
     }
 
 
@@ -1335,7 +956,7 @@
         soundToTrigger = 'airhorn';
         replyMessage = "BOOM! Incredible level of dedication and hustle! You just dominated that goal! Take a moment to celebrate yourself, you elite champion!";
       } else if (lowercaseText.includes('cook') || lowercaseText.includes('eat') || lowercaseText.includes('meal')) {
-        soundToTrigger = 'cowbell';
+        soundToTrigger = 'scratch';
         replyMessage = "YUM! Excellent nutrition fueling a superior mind! Chef-level productivity in the kitchen today! Keep cooking gold!";
       } else {
         const fallbacks = [
@@ -1381,41 +1002,9 @@
     }
 
 
-    // --- 7. PHYSICAL & VIRTUAL KEYBOARD BINDINGS ---
-    document.querySelectorAll('.piano-key').forEach(key => {
-      key.addEventListener('mousedown', () => {
-        const freq = parseFloat(key.getAttribute('data-note'));
-        playNote(freq);
-        key.classList.add('active');
-      });
-
-      key.addEventListener('mouseup', () => {
-        key.classList.remove('active');
-      });
-
-      key.addEventListener('mouseleave', () => {
-        key.classList.remove('active');
-      });
-    });
-
+    // --- 7. PHYSICAL KEYBOARD BINDINGS ---
     const soundboardKeys = {
-      'q': '0', 'w': '1', 'e': '2', 'r': '3', 't': '4', 'y': '5', 'u': '6'
-    };
-
-    const pianoKeys = {
-      'a': '261.63',  // C4
-      's': '277.18',  // C#4
-      'd': '293.66',  // D4
-      'f': '311.13',  // D#4
-      'g': '329.63',  // E4
-      'h': '349.23',  // F4
-      'i': '369.99',  // F#4
-      'j': '392.00',  // G4
-      'o': '415.30',  // G#4
-      'k': '440.00',  // A4
-      'p': '466.16',  // A#4
-      'l': '493.88',  // B4
-      ';': '523.25'   // C5
+      'q': '0', 'w': '1', 'e': '2'
     };
 
     const activeKeys = {};
@@ -1435,17 +1024,6 @@
         }
         activeKeys[key] = true;
       }
-
-      if (pianoKeys[key] !== undefined) {
-        initAudio();
-        const freq = pianoKeys[key];
-        const pianoBtn = document.querySelector(`.piano-key[data-note="${freq}"]`);
-        if (pianoBtn) {
-          pianoBtn.classList.add('active');
-          playNote(parseFloat(freq));
-        }
-        activeKeys[key] = true;
-      }
     });
 
     window.addEventListener('keyup', (e) => {
@@ -1456,12 +1034,6 @@
         const padIndex = soundboardKeys[key];
         const padBtn = document.querySelector(`.pad[data-pad="${padIndex}"]`);
         if (padBtn) padBtn.classList.remove('active');
-      }
-
-      if (pianoKeys[key] !== undefined) {
-        const freq = pianoKeys[key];
-        const pianoBtn = document.querySelector(`.piano-key[data-note="${freq}"]`);
-        if (pianoBtn) pianoBtn.classList.remove('active');
       }
     });
   </script>
