@@ -3,43 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HYPE DJ 3000 - Ultimate Voice Hype Man & Synthesizer</title>
+  <title>HYPE BOT 3000 - Conversational Hype Chatbot & Synthesizer</title>
   <style>
     /* Premium CSS Variables for Theme Management */
     :root {
-      --bg-gradient: linear-gradient(135deg, #090a0f 0%, #151821 100%);
-      --card-bg: rgba(30, 34, 48, 0.65);
+      --bg-gradient: linear-gradient(135deg, #07080d 0%, #11141e 100%);
+      --card-bg: rgba(22, 25, 37, 0.7);
       --card-border: rgba(255, 255, 255, 0.08);
       --text-color: #f3f4f6;
       --text-muted: #9ca3af;
       --accent-primary: #a855f7;
       --accent-secondary: #06b6d4;
       --accent-tertiary: #ec4899;
-      --shadow-color: rgba(0, 0, 0, 0.5);
-      --glow-intensity: 0 0 15px rgba(168, 85, 247, 0.4);
-      --glass-blur: blur(12px);
+      --shadow-color: rgba(0, 0, 0, 0.6);
+      --glow-intensity: 0 0 15px rgba(168, 85, 247, 0.45);
+      --glass-blur: blur(16px);
       --keyboard-white: #ffffff;
       --keyboard-white-active: #e2e8f0;
-      --keyboard-black: #111827;
-      --keyboard-black-active: #374151;
+      --keyboard-black: #0f172a;
+      --keyboard-black-active: #334155;
       --transition-speed: 0.3s;
+      --user-bubble-bg: rgba(255, 255, 255, 0.07);
+      --bot-bubble-bg: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(6, 182, 212, 0.15));
     }
 
     [data-theme="light"] {
       --bg-gradient: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-      --card-bg: rgba(255, 255, 255, 0.7);
-      --card-border: rgba(0, 0, 0, 0.06);
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(0, 0, 0, 0.08);
       --text-color: #1f2937;
       --text-muted: #4b5563;
       --accent-primary: #8b5cf6;
       --accent-secondary: #0891b2;
       --accent-tertiary: #db2777;
-      --shadow-color: rgba(0, 0, 0, 0.1);
+      --shadow-color: rgba(0, 0, 0, 0.08);
       --glow-intensity: 0 0 12px rgba(139, 92, 246, 0.2);
       --keyboard-white: #f9fafb;
       --keyboard-white-active: #d1d5db;
       --keyboard-black: #1f2937;
       --keyboard-black-active: #4b5563;
+      --user-bubble-bg: rgba(0, 0, 0, 0.05);
+      --bot-bubble-bg: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(8, 145, 178, 0.1));
     }
 
     /* General Reset */
@@ -69,12 +73,12 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 24px;
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
     @media (min-width: 1024px) {
       .container {
-        grid-template-columns: 1.2fr 0.8fr;
+        grid-template-columns: 1.25fr 0.75fr;
       }
     }
 
@@ -85,9 +89,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
+      padding: 12px 0;
       border-bottom: 1px solid var(--card-border);
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
 
     .brand {
@@ -97,8 +101,8 @@
     }
 
     .brand-logo {
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
       border-radius: 12px;
       display: flex;
@@ -115,7 +119,7 @@
     }
 
     .brand-title h1 {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 800;
       background: linear-gradient(to right, var(--accent-primary), var(--accent-tertiary));
       -webkit-background-clip: text;
@@ -128,7 +132,7 @@
       color: var(--text-muted);
     }
 
-    /* Theme & Controls Header */
+    /* Theme Toggle */
     .header-actions {
       display: flex;
       align-items: center;
@@ -139,7 +143,7 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       color: var(--text-color);
-      padding: 8px 14px;
+      padding: 8px 16px;
       border-radius: 20px;
       cursor: pointer;
       display: flex;
@@ -162,11 +166,11 @@
       fill: currentColor;
     }
 
-    /* Cards Structure */
+    /* Panel Base Classes */
     .panel {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 24px;
       backdrop-filter: var(--glass-blur);
       box-shadow: 0 8px 32px var(--shadow-color);
@@ -186,7 +190,7 @@
     }
 
     .panel-title {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 700;
       color: var(--text-color);
       display: flex;
@@ -200,17 +204,17 @@
       fill: var(--accent-primary);
     }
 
-    /* Voice / Agent Setup Panel */
-    .agent-wrapper {
+    /* Messenger UI: HYPE CHAT CONSOLE */
+    .messenger-wrapper {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
     }
 
     /* Visualizer Style */
     .visualizer-container {
-      height: 70px;
-      background: rgba(0, 0, 0, 0.2);
+      height: 60px;
+      background: rgba(0, 0, 0, 0.15);
       border-radius: 12px;
       display: flex;
       align-items: flex-end;
@@ -223,7 +227,7 @@
     }
 
     .visualizer-container::before {
-      content: "VOICE OUTPUT METERS";
+      content: "BOT ACTIVITY METERS";
       position: absolute;
       top: 6px;
       left: 10px;
@@ -236,202 +240,138 @@
 
     .viz-bar {
       width: 12px;
-      height: 5%;
+      height: 6%;
       background: linear-gradient(to top, var(--accent-secondary), var(--accent-primary));
       border-radius: 3px 3px 0 0;
       transition: height 0.1s ease;
     }
 
-    /* Voice Persona Select Grid */
-    .voice-selector {
+    /* Active Bot Profile Area */
+    .bot-profile-header {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .voice-selector label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .voice-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 10px;
-    }
-
-    .voice-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 10px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s ease;
-      display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 14px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
     }
 
-    .voice-card.active {
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15));
-      border-color: var(--accent-primary);
+    .bot-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
       box-shadow: var(--glow-intensity);
     }
 
-    .voice-card:hover {
-      transform: translateY(-2px);
-      background: rgba(255, 255, 255, 0.06);
+    .bot-details {
+      flex: 1;
     }
 
-    .voice-icon {
-      font-size: 1.4rem;
-    }
-
-    .voice-name {
-      font-size: 0.8rem;
+    .bot-status-title {
       font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-color);
     }
 
-    .voice-desc {
-      font-size: 0.65rem;
-      color: var(--text-muted);
+    .bot-status-sub {
+      font-size: 0.75rem;
+      color: var(--accent-secondary);
+      font-weight: 600;
     }
 
-    /* Interactive Voice Control Buttons */
-    .io-wrapper {
+    /* Chat Messages Stream Area */
+    .chat-stream {
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      height: 340px;
+      overflow-y: auto;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.15);
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .mic-section {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .mic-btn {
-      flex: 1;
-      height: 48px;
-      border-radius: 14px;
-      border: none;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
-      transition: all 0.3s ease;
-    }
-
-    .mic-btn.listening {
-      background: linear-gradient(135deg, #ef4444, #f43f5e);
-      animation: micPulse 1.5s infinite ease-in-out;
-      box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
-    }
-
-    .mic-btn:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.15);
-    }
-
-    .mic-btn svg {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
-    }
-
-    /* Chat bubble stream area */
-    .stream-container {
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      height: 220px;
-      overflow-y: auto;
-      padding: 12px;
-      background: rgba(0, 0, 0, 0.15);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .bubble {
-      max-width: 85%;
-      padding: 10px 14px;
-      border-radius: 16px;
-      font-size: 0.85rem;
-      line-height: 1.4;
+    .message-bubble {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.88rem;
+      line-height: 1.45;
       animation: bubbleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       word-wrap: break-word;
+      position: relative;
     }
 
-    .bubble-user {
+    .message-user {
       align-self: flex-end;
-      background: rgba(255, 255, 255, 0.08);
+      background: var(--user-bubble-bg);
       color: var(--text-color);
       border-bottom-right-radius: 4px;
       border: 1px solid var(--card-border);
     }
 
-    .bubble-agent {
+    .message-bot {
       align-self: flex-start;
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(6, 182, 212, 0.15));
+      background: var(--bot-bubble-bg);
       color: var(--text-color);
       border-bottom-left-radius: 4px;
       border: 1px solid var(--card-border);
     }
 
-    .bubble-meta {
+    .bubble-sender {
       font-size: 0.65rem;
       font-weight: bold;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .bubble-agent .bubble-meta {
+    .message-bot .bubble-sender {
       color: var(--accent-primary);
     }
 
-    .bubble-user .bubble-meta {
+    .message-user .bubble-sender {
       color: var(--accent-secondary);
     }
 
-    /* Custom Text Input & Quick Hype Row */
-    .text-input-row {
+    /* Chat Input Bar Row */
+    .chat-input-row {
       display: flex;
       gap: 8px;
     }
 
-    .hype-input {
+    .chat-input {
       flex: 1;
-      height: 42px;
-      border-radius: 10px;
+      height: 48px;
+      border-radius: 12px;
       border: 1px solid var(--card-border);
       background: rgba(0, 0, 0, 0.2);
       color: var(--text-color);
-      padding: 0 14px;
-      font-size: 0.85rem;
+      padding: 0 16px;
+      font-size: 0.9rem;
       outline: none;
       transition: border-color 0.2s;
     }
 
-    .hype-input:focus {
+    .chat-input:focus {
       border-color: var(--accent-primary);
     }
 
-    .send-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
       border: none;
-      background: var(--accent-primary);
       color: white;
       cursor: pointer;
       display: flex;
@@ -440,25 +380,44 @@
       transition: all 0.2s;
     }
 
+    .send-btn {
+      background: var(--accent-primary);
+    }
+
     .send-btn:hover {
       transform: translateY(-2px);
       filter: brightness(1.1);
+      box-shadow: var(--glow-intensity);
     }
 
-    .send-btn svg {
-      width: 18px;
-      height: 18px;
+    .mic-btn {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    }
+
+    .mic-btn.listening {
+      background: linear-gradient(135deg, #ef4444, #f43f5e);
+      animation: micPulse 1.5s infinite ease-in-out;
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.4);
+    }
+
+    .mic-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
       fill: currentColor;
     }
 
     /* Preset prompt chips */
-    .preset-container {
+    .chips-section {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
 
-    .preset-title {
+    .chips-title {
       font-size: 0.75rem;
       font-weight: 700;
       color: var(--text-muted);
@@ -466,17 +425,17 @@
       letter-spacing: 0.5px;
     }
 
-    .preset-chips {
+    .chips-grid {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
 
-    .preset-chip {
+    .chip {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--card-border);
       color: var(--text-color);
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 20px;
       font-size: 0.75rem;
       cursor: pointer;
@@ -484,24 +443,24 @@
       font-weight: 600;
     }
 
-    .preset-chip:hover {
+    .chip:hover {
       background: rgba(168, 85, 247, 0.1);
       border-color: var(--accent-primary);
       transform: translateY(-1px);
     }
 
-    /* soundboard & Keyboard Panel */
-    .sound-panel {
+    /* Right Column: soundboard / Synth keyboard */
+    .widget-panel {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    /* Pads/Soundboard */
+    /* Interactive Pads Soundboard */
     .soundboard-section {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .pads-grid {
@@ -511,10 +470,10 @@
     }
 
     .pad {
-      height: 64px;
+      height: 58px;
       border-radius: 12px;
       border: 1px solid var(--card-border);
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.02);
       color: var(--text-color);
       cursor: pointer;
       display: flex;
@@ -533,25 +492,25 @@
     .pad-key {
       font-size: 0.55rem;
       color: var(--text-muted);
-      margin-top: 4px;
-      background: rgba(0, 0, 0, 0.2);
-      padding: 2px 5px;
+      margin-top: 3px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 1px 4px;
       border-radius: 4px;
       font-weight: bold;
     }
 
-    /* Custom pad color theme highlights */
-    .pad-1 { border-left: 4px solid var(--accent-tertiary); }
-    .pad-2 { border-left: 4px solid var(--accent-primary); }
-    .pad-3 { border-left: 4px solid var(--accent-secondary); }
-    .pad-4 { border-left: 4px solid #10b981; }
-    .pad-5 { border-left: 4px solid #f59e0b; }
-    .pad-6 { border-left: 4px solid #3b82f6; }
-    .pad-7 { border-left: 4px solid #ec4899; }
+    /* Interactive pad color accents */
+    .pad-1 { border-left: 3px solid var(--accent-tertiary); }
+    .pad-2 { border-left: 3px solid var(--accent-primary); }
+    .pad-3 { border-left: 3px solid var(--accent-secondary); }
+    .pad-4 { border-left: 3px solid #10b981; }
+    .pad-5 { border-left: 3px solid #f59e0b; }
+    .pad-6 { border-left: 3px solid #3b82f6; }
+    .pad-7 { border-left: 3px solid #ec4899; }
 
     .pad:hover {
-      background: rgba(255, 255, 255, 0.08);
-      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
     }
 
     .pad:active, .pad.active {
@@ -561,7 +520,7 @@
       box-shadow: var(--glow-intensity);
     }
 
-    /* Piano Keyboard Section */
+    /* Synthesizer Keyboard Section */
     .keyboard-section {
       display: flex;
       flex-direction: column;
@@ -576,7 +535,7 @@
 
     .wave-picker {
       display: flex;
-      background: rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.15);
       border-radius: 8px;
       padding: 2px;
       border: 1px solid var(--card-border);
@@ -586,7 +545,7 @@
       background: transparent;
       border: none;
       color: var(--text-muted);
-      padding: 4px 10px;
+      padding: 4px 8px;
       border-radius: 6px;
       font-size: 0.7rem;
       font-weight: 700;
@@ -600,10 +559,10 @@
       color: #ffffff;
     }
 
-    /* Realistic Piano Keys */
+    /* Realistic Piano Keys UI */
     .piano-keys-wrapper {
       position: relative;
-      height: 160px;
+      height: 150px;
       background: rgba(0, 0, 0, 0.2);
       border-radius: 12px;
       padding: 6px;
@@ -629,9 +588,9 @@
       flex-direction: column;
       justify-content: flex-end;
       align-items: center;
-      padding-bottom: 10px;
+      padding-bottom: 8px;
       font-weight: 700;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       user-select: none;
       transition: background 0.1s, transform 0.1s;
     }
@@ -684,9 +643,9 @@
     }
 
     .key-bind {
-      font-size: 0.6rem;
+      font-size: 0.55rem;
       color: var(--text-muted);
-      margin-top: 2px;
+      margin-top: 1px;
       font-weight: bold;
     }
 
@@ -713,7 +672,7 @@
       }
       50% {
         box-shadow: 0 0 25px rgba(236, 72, 153, 0.7);
-        transform: scale(1.05);
+        transform: scale(1.04);
       }
     }
 
@@ -729,7 +688,7 @@
     @keyframes bubbleIn {
       from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(12px);
       }
       to {
         opacity: 1;
@@ -744,21 +703,21 @@
   <header>
     <div class="brand">
       <div class="brand-logo">
-        <!-- SVG Lightning/Hype Icon -->
+        <!-- SVG Lightning/Bot Icon -->
         <svg viewBox="0 0 24 24">
-          <path d="M19 9h-4V3H9v11h4v7z"/>
+          <path d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.7-1.3-3-3-3S9 3.3 9 5H6c-1.1 0-2 .9-2 2v2c-1.7 0-3 1.3-3 3s1.3 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.7 0 3-1.3 3-3s-1.3-3-3-3zm-2 10H6V7h12v12zm-9-6c-.8 0-1.5-.7-1.5-1.5S8.2 10 9 10s1.5.7 1.5 1.5S9.8 13 9 13zm6 0c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm-6 3h6v1.5H9V16z"/>
         </svg>
       </div>
       <div class="brand-title">
-        <h1>HYPE DJ 3000</h1>
-        <p>Interactive AI Voice Hype Man & Audio FX Synthesizer</p>
+        <h1>HYPE BOT 3000</h1>
+        <p>Conversational Hype Chatbot & Dynamic Soundboard Synthesizer</p>
       </div>
     </div>
     <div class="header-actions">
       <!-- Dark/Light Theme Toggle -->
       <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle Theme">
         <svg id="themeIcon" viewBox="0 0 24 24">
-          <!-- Default Moon Icon for Dark Mode -->
+          <!-- Moon Icon for Dark Mode -->
           <path d="M12.1 22c-5.5 0-10-4.5-10-10 0-4.8 3.5-8.9 8.2-9.8.5-.1 1 .3.9.8-.1.4-.4.8-.8 1C8.1 4.9 6.6 7.2 6.6 10c0 4.1 3.3 7.4 7.4 7.4 2.8 0 5.1-1.5 6.1-3.8.2-.4.6-.7 1-.8.6-.1 1 .4.8.9-.9 4.7-5 8.3-9.8 8.3z"/>
         </svg>
         <span id="themeText">Light Mode</span>
@@ -769,84 +728,79 @@
   <!-- Main Content Layout -->
   <div class="container">
 
-    <!-- Left Column: Voice Hype Agent Console -->
+    <!-- Left Column: Conversational Chatbot Console -->
     <main class="panel">
       <div class="panel-header">
         <div class="panel-title">
-          <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
-          HYPE CONSOLE
+          <svg viewBox="0 0 24 24"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v12l4-4h10c.55 0 1-.45 1-1z"/></svg>
+          HYPE MESSENGER
         </div>
-        <div id="agentStatus" style="font-size: 0.75rem; color: var(--accent-secondary); font-weight: bold; letter-spacing: 0.5px;">AGENT IDLE</div>
+        <div id="botStatus" style="font-size: 0.75rem; color: var(--accent-secondary); font-weight: bold; letter-spacing: 0.5px;">BOT IDLE</div>
       </div>
 
-      <div class="agent-wrapper">
+      <div class="messenger-wrapper">
         <!-- Live equalizing bars -->
         <div class="visualizer-container" id="visualizer">
-          <!-- Generate bars dynamically -->
+          <!-- Generated dynamically via JS -->
         </div>
 
-        <!-- Voice Select / Persona Customizer Grid -->
-        <div class="voice-selector">
-          <label>SELECT A VOICE PERSONA</label>
-          <div class="voice-grid" id="voiceGrid">
-            <!-- Populated via JS -->
+        <!-- Bot Active Profile Info -->
+        <div class="bot-profile-header">
+          <div class="bot-avatar" id="botAvatar">🤖</div>
+          <div class="bot-details">
+            <div class="bot-status-title" id="botAvatarName">Hype Bot</div>
+            <div class="bot-status-sub">Ready to motivate you!</div>
           </div>
         </div>
 
-        <!-- Dynamic Output Stream (Chat bubbler) -->
-        <div class="stream-container" id="streamContainer">
-          <div class="bubble bubble-agent">
-            <div class="bubble-meta">SYSTEM</div>
-            Welcome to HYPE DJ 3000! Turn up your volume, choose a hype voice, type some achievements below, or hit the listening button to let me hype you up live!
+        <!-- Chat Bubble Stream Area -->
+        <div class="chat-stream" id="chatStream">
+          <div class="message-bubble message-bot">
+            <div class="bubble-sender">HYPE BOT</div>
+            Hey friend! Welcome to HYPE BOT 3000! Drop an achievement, score, or goal you accomplished today. Use the synthesizer and soundboard to add custom backbeats!
           </div>
         </div>
 
         <!-- Input Section -->
-        <div class="io-wrapper">
-          <div class="mic-section">
-            <button class="mic-btn" id="micBtn" title="Hold or press to listen to you">
-              <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
-              <span id="micBtnText">LISTEN LIVE</span>
-            </button>
-          </div>
-
-          <div class="text-input-row">
-            <input type="text" class="hype-input" id="hypeInput" placeholder="Type an accomplishment here (e.g. 'I just finished a marathon')...">
-            <button class="send-btn" id="sendBtn" title="Send text to hype engine">
-              <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-            </button>
-          </div>
+        <div class="chat-input-row">
+          <button class="icon-btn mic-btn" id="micBtn" title="Speak into microphone">
+            <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
+          </button>
+          <input type="text" class="chat-input" id="chatInput" placeholder="Type what you did today (e.g. 'I coded 5 hours non-stop')...">
+          <button class="icon-btn send-btn" id="sendBtn" title="Send message">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
         </div>
 
-        <!-- Preset Fast Achievements Buttons -->
-        <div class="preset-container">
-          <div class="preset-title">Fast Hype Boosters</div>
-          <div class="preset-chips">
-            <button class="preset-chip" onclick="triggerPreset('I completed all my coding goals!')">💻 Coded like a machine!</button>
-            <button class="preset-chip" onclick="triggerPreset('I woke up early today!')">🌅 Early bird run!</button>
-            <button class="preset-chip" onclick="triggerPreset('I drank enough water today.')">💧 Pure hydration!</button>
-            <button class="preset-chip" onclick="triggerPreset('I feel super tired and unmotivated.')">⚡ Fuel my battery!</button>
-            <button class="preset-chip" onclick="triggerPreset('My team just won the tournament!')">🏆 Massive victory!</button>
+        <!-- Preset Achievements Buttons -->
+        <div class="chips-section">
+          <div class="chips-title">Quick Achievements Boosters</div>
+          <div class="chips-grid">
+            <button class="chip" onclick="triggerPreset('I completed all my coding goals!')">💻 Built some awesome code!</button>
+            <button class="chip" onclick="triggerPreset('I went to the gym for an intense workout!')">💪 Hit a new gym PR!</button>
+            <button class="chip" onclick="triggerPreset('I cooked a healthy delicious meal.')">🥗 Nutritious cooking!</button>
+            <button class="chip" onclick="triggerPreset('I feel super unmotivated and need a spark.')">⚡ Spark my battery!</button>
+            <button class="chip" onclick="triggerPreset('My team just won our match!')">🏆 Clean victory!</button>
           </div>
         </div>
 
       </div>
     </main>
 
-    <!-- Right Column: Soundboard / Keyboard Pads -->
+    <!-- Right Column: soundboard / Synth keyboard -->
     <aside class="panel">
       <div class="panel-header">
         <div class="panel-title">
           <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-          HYPE SOUNDBOARD & SYNTH
+          SOUNDBOARD & SYNTH
         </div>
       </div>
 
-      <div class="sound-panel">
+      <div class="widget-panel">
 
-        <!-- Soundboard Pads Row -->
+        <!-- Interactive Soundboard Pads -->
         <div class="soundboard-section">
-          <div class="preset-title" style="margin-bottom: 6px;">SOUND EFFECTS (Q - U)</div>
+          <div class="chips-title" style="margin-bottom: 6px;">SOUNDBOARD SFX (Q - U)</div>
           <div class="pads-grid" id="padsGrid">
             <button class="pad pad-1" data-pad="0" onclick="triggerSFX('airhorn')">
               <span class="pad-label">Airhorn</span>
@@ -861,7 +815,7 @@
               <span class="pad-key">E</span>
             </button>
             <button class="pad pad-4" data-pad="3" onclick="triggerSFX('kick')">
-              <span class="pad-label">Kick Drum</span>
+              <span class="pad-label">Kick</span>
               <span class="pad-key">R</span>
             </button>
             <button class="pad pad-5" data-pad="4" onclick="triggerSFX('snare')">
@@ -879,10 +833,10 @@
           </div>
         </div>
 
-        <!-- Piano Keyboard Synth Section -->
+        <!-- Piano Synth Keyboard -->
         <div class="keyboard-section">
           <div class="synth-header-row">
-            <div class="preset-title">SYNTH KEYBOARD (A - K)</div>
+            <div class="chips-title">SYNTH INSTRUMENT (A - K)</div>
             <div class="wave-picker">
               <button class="wave-btn active" data-wave="sine" onclick="setWaveType('sine')">Sine</button>
               <button class="wave-btn" data-wave="triangle" onclick="setWaveType('triangle')">Tri</button>
@@ -893,7 +847,6 @@
 
           <div class="piano-keys-wrapper">
             <div class="piano-keyboard" id="pianoKeyboard">
-              <!-- Keys generated dynamically or manually positioned in layout -->
               <div class="piano-key white-key" data-note="261.63" data-note-bind="A">
                 <span>C4</span>
                 <span class="key-bind">A</span>
@@ -957,8 +910,8 @@
 
   <!-- App Footer -->
   <footer>
-    <p>⚡ Crafted for ultra-positivity and premium sound performance ⚡</p>
-    <p>Keyboard bindings: Pads (Q, W, E, R, T, Y, U) • Piano (A, S, D, F, G, H, J, K, L, ;)</p>
+    <p>🤖 Conversational Hype Bot 3000 online and fully responsive 🤖</p>
+    <p>Keyboard triggers: Soundboard (Q, W, E, R, T, Y, U) • Synth Keyboard (A, S, D, F, G, H, I, J, O, K, P, L, ;)</p>
   </footer>
 
   <script>
@@ -967,7 +920,6 @@
     const themeIcon = document.getElementById('themeIcon');
     const themeText = document.getElementById('themeText');
 
-    // Retrieve previous theme or check browser preference
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
     updateThemeUI(savedTheme);
@@ -983,11 +935,9 @@
     function updateThemeUI(theme) {
       if (theme === 'dark') {
         themeText.textContent = "Dark Mode";
-        // Moon Icon
         themeIcon.innerHTML = `<path d="M12.1 22c-5.5 0-10-4.5-10-10 0-4.8 3.5-8.9 8.2-9.8.5-.1 1 .3.9.8-.1.4-.4.8-.8 1C8.1 4.9 6.6 7.2 6.6 10c0 4.1 3.3 7.4 7.4 7.4 2.8 0 5.1-1.5 6.1-3.8.2-.4.6-.7 1-.8.6-.1 1 .4.8.9-.9 4.7-5 8.3-9.8 8.3z"/>`;
       } else {
         themeText.textContent = "Light Mode";
-        // Sun Icon
         themeIcon.innerHTML = `<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.38-.38.38-1.02 0-1.41z"/>`;
       }
     }
@@ -1014,7 +964,7 @@
       });
     }
 
-    // Dynamic Visualizer Bars Generator
+    // Dynamic Visualizer Bars
     const visualizer = document.getElementById('visualizer');
     const totalBars = 32;
     for (let i = 0; i < totalBars; i++) {
@@ -1023,12 +973,11 @@
       visualizer.appendChild(bar);
     }
 
-    // Keep visualizer pulsing or reactive
     let vizInterval = null;
     function pulseVisualizer(active, durationMs = 1500) {
       if (!active) {
         if (vizInterval) clearInterval(vizInterval);
-        document.querySelectorAll('.viz-bar').forEach(bar => bar.style.height = '5%');
+        document.querySelectorAll('.viz-bar').forEach(bar => bar.style.height = '6%');
         return;
       }
       if (vizInterval) clearInterval(vizInterval);
@@ -1041,7 +990,7 @@
           return;
         }
         document.querySelectorAll('.viz-bar').forEach(bar => {
-          const randomHeight = Math.floor(Math.random() * 85) + 10;
+          const randomHeight = Math.floor(Math.random() * 80) + 10;
           bar.style.height = `${randomHeight}%`;
         });
       }, 70);
@@ -1049,8 +998,6 @@
 
 
     // --- 3. PREMIUM SYNTH INSTRUMENTS / SFX ---
-
-    // Play Piano Synth Notes (C4-C5)
     function playNote(freq) {
       initAudio();
       const osc = audioCtx.createOscillator();
@@ -1059,9 +1006,8 @@
       osc.type = waveType;
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
 
-      // ADSR envelope simulation
       gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 0.05); // Attack
+      gainNode.gain.linearRampToValueAtTime(0.35, audioCtx.currentTime + 0.05); // Attack
       gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2); // Decay/Sustain
 
       osc.connect(gainNode);
@@ -1073,48 +1019,30 @@
       pulseVisualizer(true, 300);
     }
 
-    // Trigger Custom Audio SFX (No External Files Needed!)
     function triggerSFX(type) {
       initAudio();
       switch(type) {
-        case 'airhorn':
-          playAirhorn();
-          break;
-        case 'scratch':
-          playScratch();
-          break;
-        case 'bassdrop':
-          playBassDrop();
-          break;
-        case 'kick':
-          playKick();
-          break;
-        case 'snare':
-          playSnare();
-          break;
-        case 'hihat':
-          playHihat();
-          break;
-        case 'cowbell':
-          playCowbell();
-          break;
+        case 'airhorn': playAirhorn(); break;
+        case 'scratch': playScratch(); break;
+        case 'bassdrop': playBassDrop(); break;
+        case 'kick': playKick(); break;
+        case 'snare': playSnare(); break;
+        case 'hihat': playHihat(); break;
+        case 'cowbell': playCowbell(); break;
       }
     }
 
-    // Synthesized Airhorn Effect (Triple Sawtooth sweeps)
     function playAirhorn() {
       const duration = 0.8;
       const baseFreq = 660;
-      const offsets = [0, 5, -5];
+      const offsets = [0, 4, -4];
 
       offsets.forEach(offset => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(baseFreq + offset, audioCtx.currentTime);
-
-        // Pitch pulse modulation
-        osc.frequency.linearRampToValueAtTime(baseFreq - 100, audioCtx.currentTime + duration);
+        osc.frequency.linearRampToValueAtTime(baseFreq - 120, audioCtx.currentTime + duration);
 
         gain.gain.setValueAtTime(0, audioCtx.currentTime);
         gain.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 0.05);
@@ -1129,7 +1057,7 @@
       pulseVisualizer(true, 800);
     }
 
-    // Synthesized DJ Scratch Effect
+    // Scratch Scratch Sound
     function playScratch() {
       const duration = 0.45;
       const osc = audioCtx.createOscillator();
@@ -1138,13 +1066,12 @@
 
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-      // Sweeping frequency up and down to sound like a vinyl scratching
-      osc.frequency.linearRampToValueAtTime(1600, audioCtx.currentTime + 0.15);
-      osc.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 0.3);
-      osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.45);
+      osc.frequency.linearRampToValueAtTime(1500, audioCtx.currentTime + 0.15);
+      osc.frequency.linearRampToValueAtTime(130, audioCtx.currentTime + 0.3);
+      osc.frequency.linearRampToValueAtTime(750, audioCtx.currentTime + 0.45);
 
       filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(900, audioCtx.currentTime);
+      filter.frequency.setValueAtTime(850, audioCtx.currentTime);
 
       gain.gain.setValueAtTime(0, audioCtx.currentTime);
       gain.gain.linearRampToValueAtTime(0.25, audioCtx.currentTime + 0.05);
@@ -1159,7 +1086,6 @@
       pulseVisualizer(true, 450);
     }
 
-    // Synthesized Classic Deep Bass Drop
     function playBassDrop() {
       const duration = 1.8;
       const osc = audioCtx.createOscillator();
@@ -1167,7 +1093,7 @@
 
       osc.type = 'sine';
       osc.frequency.setValueAtTime(140, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(32, audioCtx.currentTime + duration);
+      osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + duration);
 
       gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
@@ -1180,7 +1106,6 @@
       pulseVisualizer(true, 1800);
     }
 
-    // Synthesized Classic Analog Kick Drum
     function playKick() {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -1200,9 +1125,7 @@
       pulseVisualizer(true, 250);
     }
 
-    // Synthesized Snare Drum (Filtered White Noise + decaying tone)
     function playSnare() {
-      // Noise buffer creation for crisp analog snare rattle
       const bufferSize = audioCtx.sampleRate * 0.2;
       const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
@@ -1225,7 +1148,6 @@
       filter.connect(noiseGain);
       noiseGain.connect(audioCtx.destination);
 
-      // Decaying base hit tone
       const osc = audioCtx.createOscillator();
       const oscGain = audioCtx.createGain();
       osc.type = 'triangle';
@@ -1243,7 +1165,6 @@
       pulseVisualizer(true, 200);
     }
 
-    // Synthesized High-pitched crisp Hi-Hat
     function playHihat() {
       const bufferSize = audioCtx.sampleRate * 0.08;
       const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -1257,7 +1178,7 @@
 
       const filter = audioCtx.createBiquadFilter();
       filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(10000, audioCtx.currentTime);
+      filter.frequency.setValueAtTime(9500, audioCtx.currentTime);
 
       const gain = audioCtx.createGain();
       gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
@@ -1271,7 +1192,6 @@
       pulseVisualizer(true, 80);
     }
 
-    // Synthesized Cowbell
     function playCowbell() {
       const osc1 = audioCtx.createOscillator();
       const osc2 = audioCtx.createOscillator();
@@ -1281,7 +1201,6 @@
       osc1.type = 'square';
       osc2.type = 'square';
 
-      // Cowbell fundamental frequencies
       osc1.frequency.setValueAtTime(800, audioCtx.currentTime);
       osc2.frequency.setValueAtTime(540, audioCtx.currentTime);
 
@@ -1305,165 +1224,43 @@
     }
 
 
-    // --- 4. MULTI-VOICE PERSONA MANAGEMENT ---
-
-    // Five diverse, ultra-cool hype personas with tailored Web Speech Synthesis setups
-    const voicePersonas = [
-      {
-        id: 'firestar',
-        name: 'DJ Firestar',
-        emoji: '🔥',
-        desc: 'Fast, intense, absolute fire',
-        pitch: 1.25,
-        rate: 1.15,
-        prefixes: ["OH MY GOSH! ", "YO! CHANCELLOR OF COOL! ", "A-HA! ", "LET'S GO! "],
-        suffixes: [" THAT IS ABSOLUTELY INSANE!", " BOOM! FIRE ALARM INCOMING!", " WE ARE GOING TO THE MOON!"]
-      },
-      {
-        id: 'coach',
-        name: 'Coach Beast',
-        emoji: '🦁',
-        desc: 'Aggressive motivational fuel',
-        pitch: 0.95,
-        rate: 1.1,
-        prefixes: ["ATTENTION CHAMPION! ", "LISTEN TO ME! ", "NO EXCUSES! "],
-        suffixes: [" NOW PUSH IT EVEN HARDER!", " YOU ARE A MACHINE!", " COMPETE WITH NO ONE BUT YOURSELF!"]
-      },
-      {
-        id: 'snoop',
-        name: 'Snoop Hype',
-        emoji: '🕶️',
-        desc: 'Laid back, smooth & cool',
-        pitch: 0.85,
-        rate: 0.85,
-        prefixes: ["Yeah, real smooth. ", "Check it out, baby. ", "Mmm-hmm, cool breeze. "],
-        suffixes: [" keepin' it 100.", " that's pure class.", " fo' shizzle, my friend."]
-      },
-      {
-        id: 'robo',
-        name: 'Robo-Hype',
-        emoji: '🤖',
-        desc: 'Cybernetic calculation praise',
-        pitch: 0.6,
-        rate: 1.05,
-        prefixes: ["INCOMING HIGH PERFORMANCE DETECTED. ", "SYSTEM CHECK: PASS. ", "CYBERNETIC CONGRATULATIONS: "],
-        suffixes: [" HUMAN SUPERIORITY CONFIRMED.", " EFFICIENCY AT 99 PERCENT.", " RETURNING TO OPTIMAL HYPING STATE."]
-      },
-      {
-        id: 'chibi',
-        name: 'Anime Chibi',
-        emoji: '✨',
-        desc: 'High-pitched kawaii cheering',
-        pitch: 1.6,
-        rate: 1.2,
-        prefixes: ["Yatta! ", "Sugoi, senpai! ", "Yay! "],
-        suffixes: [" You are the absolute best!", " Sparkles flying everywhere!", " Nico nico nii! Go!"]
-      }
-    ];
-
-    let currentPersona = voicePersonas[0];
-
-    // Populate Voice Selection Grid
-    const voiceGrid = document.getElementById('voiceGrid');
-    voicePersonas.forEach(p => {
-      const card = document.createElement('div');
-      card.className = `voice-card ${p.id === currentPersona.id ? 'active' : ''}`;
-      card.setAttribute('data-id', p.id);
-      card.innerHTML = `
-        <span class="voice-icon">${p.emoji}</span>
-        <span class="voice-name">${p.name}</span>
-        <span class="voice-desc">${p.desc}</span>
-      `;
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        currentPersona = p;
-        speakHype(`DJ ${p.name} is now in the building! Ready to drop the heat.`);
-      });
-      voiceGrid.appendChild(card);
-    });
-
-
-    // --- 5. TALK BACK (SPEECH SYNTHESIS ENGINE) ---
-    const streamContainer = document.getElementById('streamContainer');
-    const agentStatus = document.getElementById('agentStatus');
+    // --- 4. CONVERSATIONAL MESSENGER ---
+    const chatStream = document.getElementById('chatStream');
+    const botStatus = document.getElementById('botStatus');
 
     function appendMessage(sender, text) {
       const bubble = document.createElement('div');
-      bubble.className = `bubble bubble-${sender}`;
+      bubble.className = `message-bubble message-${sender}`;
 
       const meta = document.createElement('div');
-      meta.className = 'bubble-meta';
-      meta.textContent = sender === 'agent' ? currentPersona.name : 'YOU';
+      meta.className = 'bubble-sender';
+      meta.textContent = sender === 'bot' ? 'HYPE BOT' : 'YOU';
       bubble.appendChild(meta);
 
       const contentSpan = document.createElement('span');
       contentSpan.textContent = text; // Secure from XSS
       bubble.appendChild(contentSpan);
 
-      streamContainer.appendChild(bubble);
-      streamContainer.scrollTop = streamContainer.scrollHeight;
+      chatStream.appendChild(bubble);
+      chatStream.scrollTop = chatStream.scrollHeight;
     }
 
-    // Main speech synth triggering
     function speakHype(plainText) {
-      if (!('speechSynthesis' in window)) {
-        appendMessage('agent', "I want to hype you up out loud, but your browser doesn't support local Speech Synthesis! Read this instead: " + plainText);
-        return;
-      }
+      botStatus.textContent = "BOT TYPING";
+      botStatus.style.color = "var(--accent-tertiary)";
+      pulseVisualizer(true, 1200);
 
-      // Stop any existing speech
-      window.speechSynthesis.cancel();
-
-      // Formulate voice output structure with prefixes/suffixes for rich character hyping
-      const randomPrefix = currentPersona.prefixes[Math.floor(Math.random() * currentPersona.prefixes.length)];
-      const randomSuffix = currentPersona.suffixes[Math.floor(Math.random() * currentPersona.suffixes.length)];
-      const fullSpeechText = `${randomPrefix}${plainText}${randomSuffix}`;
-
-      appendMessage('agent', fullSpeechText);
-
-      const utterance = new SpeechSynthesisUtterance(fullSpeechText);
-      utterance.pitch = currentPersona.pitch;
-      utterance.rate = currentPersona.rate;
-      utterance.volume = 1.0;
-
-      // Select matching system voice to polish standard speech synthesis
-      const voices = window.speechSynthesis.getVoices();
-      let bestVoice = null;
-      if (currentPersona.id === 'robo') {
-        bestVoice = voices.find(v => v.name.toLowerCase().includes('robot') || v.name.toLowerCase().includes('google uk english'));
-      } else if (currentPersona.id === 'chibi') {
-        bestVoice = voices.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('samantha'));
-      } else {
-        bestVoice = voices.find(v => v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('premium'));
-      }
-      if (bestVoice) utterance.voice = bestVoice;
-
-      utterance.onstart = () => {
-        agentStatus.textContent = "AGENT SPEAKING";
-        agentStatus.style.color = "var(--accent-tertiary)";
-        pulseVisualizer(true, 0); // Keep pulsing while speaking
-      };
-
-      utterance.onend = () => {
-        agentStatus.textContent = "AGENT IDLE";
-        agentStatus.style.color = "var(--accent-secondary)";
+      setTimeout(() => {
+        appendMessage('bot', plainText);
+        botStatus.textContent = "BOT IDLE";
+        botStatus.style.color = "var(--accent-secondary)";
         pulseVisualizer(false);
-      };
-
-      utterance.onerror = () => {
-        agentStatus.textContent = "AGENT IDLE";
-        agentStatus.style.color = "var(--accent-secondary)";
-        pulseVisualizer(false);
-      };
-
-      window.speechSynthesis.speak(utterance);
+      }, 600);
     }
 
 
-    // --- 6. LISTEN (WEB SPEECH RECOGNITION) ---
+    // --- 5. LISTEN (VOICE INPUT SPEECH RECOGNITION) ---
     const micBtn = document.getElementById('micBtn');
-    const micBtnText = document.getElementById('micBtnText');
     let recognition = null;
     let isListening = false;
 
@@ -1477,9 +1274,8 @@
       recognition.onstart = () => {
         isListening = true;
         micBtn.classList.add('listening');
-        micBtnText.textContent = "LISTENING... SAY SOMETHING!";
-        agentStatus.textContent = "AGENT LISTENING";
-        agentStatus.style.color = "#ef4444";
+        botStatus.textContent = "BOT LISTENING";
+        botStatus.style.color = "#ef4444";
       };
 
       recognition.onresult = (event) => {
@@ -1496,22 +1292,21 @@
         stopListeningState();
       };
     } else {
-      micBtn.style.background = "linear-gradient(135deg, #4b5563, #6b7280)";
-      micBtnText.textContent = "MIC DISCONNECTED (No Web Speech)";
+      micBtn.style.opacity = "0.5";
+      micBtn.title = "Microphone input not supported by browser";
     }
 
     function stopListeningState() {
       isListening = false;
       micBtn.classList.remove('listening');
-      micBtnText.textContent = "LISTEN LIVE";
-      agentStatus.textContent = "AGENT IDLE";
-      agentStatus.style.color = "var(--accent-secondary)";
+      botStatus.textContent = "BOT IDLE";
+      botStatus.style.color = "var(--accent-secondary)";
     }
 
     micBtn.addEventListener('click', () => {
       initAudio();
       if (!recognition) {
-        appendMessage('agent', "Web Speech Recognition isn't supported on this browser version. Use the text input below to get hyped!");
+        appendMessage('bot', "Web Speech Recognition isn't supported on this browser version. Use the chat bar below!");
         return;
       }
       if (isListening) {
@@ -1521,7 +1316,7 @@
       }
     });
 
-    // Handle incoming inputs dynamically with NLP/keyword triggers
+    // Handle user input text/voice
     function handleUserSpeech(text) {
       if (!text.trim()) return;
       appendMessage('user', text);
@@ -1530,57 +1325,54 @@
       let soundToTrigger = null;
       let replyMessage = "";
 
-      // Smart semantic parser
-      if (lowercaseText.includes('tired') || lowercaseText.includes('sad') || lowercaseText.includes('exhausted') || lowercaseText.includes('give up')) {
+      if (lowercaseText.includes('tired') || lowercaseText.includes('sad') || lowercaseText.includes('exhausted') || lowercaseText.includes('give up') || lowercaseText.includes('need a spark')) {
         soundToTrigger = 'bassdrop';
-        replyMessage = "I heard you feeling a little low. Stand up, roll those shoulders back! You have overcome 100% of your bad days so far! You are legendary!";
-      } else if (lowercaseText.includes('code') || lowercaseText.includes('program') || lowercaseText.includes('computer') || lowercaseText.includes('bug')) {
+        replyMessage = "OH NO! I detected you are feeling a bit drained. Stand tall, roll your shoulders back! You have a 100% survival rate of tough days. You are an absolute warrior! LET'S SHINE!";
+      } else if (lowercaseText.includes('code') || lowercaseText.includes('program') || lowercaseText.includes('computer') || lowercaseText.includes('built')) {
         soundToTrigger = 'scratch';
-        replyMessage = "A master software architect in action! Compiling glory one line at a time. The world runs on your logic!";
-      } else if (lowercaseText.includes('win') || lowercaseText.includes('victor') || lowercaseText.includes('success') || lowercaseText.includes('finish') || lowercaseText.includes('complete')) {
+        replyMessage = "WHOA! An absolute code wizard in action! Designing structures, squashin' bugs, compiling absolute digital gold! YOU GO, DEVELOPER!";
+      } else if (lowercaseText.includes('win') || lowercaseText.includes('victor') || lowercaseText.includes('success') || lowercaseText.includes('workout') || lowercaseText.includes('gym')) {
         soundToTrigger = 'airhorn';
-        replyMessage = "YES! A absolute monumental triumph! Take a bow, you just dominated that milestone! Let the history books write this down!";
-      } else if (lowercaseText.includes('drum') || lowercaseText.includes('beat') || lowercaseText.includes('rhythm')) {
-        soundToTrigger = 'kick';
-        replyMessage = "Dropping that ultimate rhythmic baseline! Feel the tempo of success rising up!";
+        replyMessage = "BOOM! Incredible level of dedication and hustle! You just dominated that goal! Take a moment to celebrate yourself, you elite champion!";
+      } else if (lowercaseText.includes('cook') || lowercaseText.includes('eat') || lowercaseText.includes('meal')) {
+        soundToTrigger = 'cowbell';
+        replyMessage = "YUM! Excellent nutrition fueling a superior mind! Chef-level productivity in the kitchen today! Keep cooking gold!";
       } else {
-        // Random fallback hype phrases
         const fallbacks = [
-          `You spoke: "${text}". And honestly? That is pure world-class energy! No one does it better than you!`,
-          `Listen to me, superstar. You just delivered absolute gold with that thought. Keep crushing it!`,
-          `I am analyzing your vibe and the metrics are off the charts! Maximum success rating guaranteed!`,
-          `Boom! You are writing your own destiny right now. Let's make it epic!`
+          `Oh wow! You told me: "${text}". That is absolutely elite tier performance!`,
+          `I am analyzing your progress and the metrics are completely off the charts! Keep shining!`,
+          `You're demonstrating elite consistency. The momentum is firmly in your favor now!`,
+          `Magnificent! Every small action is building your monumental empire. Let's get it!`
         ];
         replyMessage = fallbacks[Math.floor(Math.random() * fallbacks.length)];
       }
 
-      // Chain custom SFX and Hype synthesis
       if (soundToTrigger) {
         setTimeout(() => triggerSFX(soundToTrigger), 100);
       }
-      setTimeout(() => speakHype(replyMessage), 400);
+      setTimeout(() => speakHype(replyMessage), 450);
     }
 
 
-    // --- 7. TEXT INPUT & QUICK CHIPS ---
+    // --- 6. CHAT INPUT & PRESET BOOST CHIPS ---
     const sendBtn = document.getElementById('sendBtn');
-    const hypeInput = document.getElementById('hypeInput');
+    const chatInput = document.getElementById('chatInput');
 
     sendBtn.addEventListener('click', () => {
       sendTextInput();
     });
 
-    hypeInput.addEventListener('keydown', (e) => {
+    chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         sendTextInput();
       }
     });
 
     function sendTextInput() {
-      const val = hypeInput.value.trim();
+      const val = chatInput.value.trim();
       if (val) {
         handleUserSpeech(val);
-        hypeInput.value = "";
+        chatInput.value = "";
       }
     }
 
@@ -1589,9 +1381,7 @@
     }
 
 
-    // --- 8. PHYSICAL & VIRTUAL KEYBOARD BINDINGS ---
-
-    // Virtual click listener on Piano Keys
+    // --- 7. PHYSICAL & VIRTUAL KEYBOARD BINDINGS ---
     document.querySelectorAll('.piano-key').forEach(key => {
       key.addEventListener('mousedown', () => {
         const freq = parseFloat(key.getAttribute('data-note'));
@@ -1608,15 +1398,8 @@
       });
     });
 
-    // Key Maps
     const soundboardKeys = {
-      'q': '0',
-      'w': '1',
-      'e': '2',
-      'r': '3',
-      't': '4',
-      'y': '5',
-      'u': '6'
+      'q': '0', 'w': '1', 'e': '2', 'r': '3', 't': '4', 'y': '5', 'u': '6'
     };
 
     const pianoKeys = {
@@ -1635,17 +1418,13 @@
       ';': '523.25'   // C5
     };
 
-    // Keep track of active keys to prevent continuous repeat firing
     const activeKeys = {};
 
     window.addEventListener('keydown', (e) => {
       const key = e.key.toLowerCase();
       if (activeKeys[key]) return;
+      if (document.activeElement === chatInput) return;
 
-      // Ignore if user is writing in the input field
-      if (document.activeElement === hypeInput) return;
-
-      // Check Soundboard triggers (Q-U)
       if (soundboardKeys[key] !== undefined) {
         initAudio();
         const padIndex = soundboardKeys[key];
@@ -1657,7 +1436,6 @@
         activeKeys[key] = true;
       }
 
-      // Check Piano synth triggers (A-;)
       if (pianoKeys[key] !== undefined) {
         initAudio();
         const freq = pianoKeys[key];
@@ -1686,15 +1464,6 @@
         if (pianoBtn) pianoBtn.classList.remove('active');
       }
     });
-
-    // Speak introductory greetings once the page fully initializes
-    window.addEventListener('DOMContentLoaded', () => {
-      // Small delayed speech to avoid autoplay browser blocks until interaction
-      setTimeout(() => {
-        console.log("Hype DJ 3000 online and loaded.");
-      }, 500);
-    });
-
   </script>
 </body>
 </html>
