@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HYPE BOT 3000 - Conversational Hype Chatbot & Soundboard</title>
+  <style>
+    /* Premium CSS Variables for Theme Management */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #07080d 0%, #11141e 100%);
+      --card-bg: rgba(22, 25, 37, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-color: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent-primary: #a855f7;
+      --accent-secondary: #06b6d4;
+      --accent-tertiary: #ec4899;
+      --shadow-color: rgba(0, 0, 0, 0.6);
+      --glow-intensity: 0 0 15px rgba(168, 85, 247, 0.45);
+      --glass-blur: blur(16px);
+      --transition-speed: 0.3s;
+      --user-bubble-bg: rgba(255, 255, 255, 0.07);
+      --bot-bubble-bg: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(6, 182, 212, 0.15));
+    }
+
+    [data-theme="light"] {
+      --bg-gradient: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --text-color: #1f2937;
+      --text-muted: #4b5563;
+      --accent-primary: #8b5cf6;
+      --accent-secondary: #0891b2;
+      --accent-tertiary: #db2777;
+      --shadow-color: rgba(0, 0, 0, 0.08);
+      --glow-intensity: 0 0 12px rgba(139, 92, 246, 0.2);
+      --user-bubble-bg: rgba(0, 0, 0, 0.05);
+      --bot-bubble-bg: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(8, 145, 178, 0.1));
+    }
+
+    /* General Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      transition: background var(--transition-speed), color var(--transition-speed);
+      overflow-x: hidden;
+    }
+
+    /* Layout Wrapper */
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 1024px) {
+      .container {
+        grid-template-columns: 1.3fr 0.7fr;
+      }
+    }
+
+    /* Header Section */
+    header {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--glow-intensity);
+      animation: logoPulse 3s infinite ease-in-out;
+    }
+
+    .brand-logo svg {
+      width: 24px;
+      height: 24px;
+      fill: #ffffff;
+    }
+
+    .brand-title h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(to right, var(--accent-primary), var(--accent-tertiary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
+
+    .brand-title p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Theme Toggle */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-color);
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 6px var(--shadow-color);
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-primary);
+    }
+
+    .theme-toggle-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* Panel Base Classes */
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: var(--glass-blur);
+      box-shadow: 0 8px 32px var(--shadow-color);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all var(--transition-speed);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+      margin-bottom: 4px;
+    }
+
+    .panel-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--accent-primary);
+    }
+
+    /* Messenger UI: HYPE CHAT CONSOLE */
+    .messenger-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Visualizer Style */
+    .visualizer-container {
+      height: 60px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 3px;
+      padding: 8px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+
+    .visualizer-container::before {
+      content: "BOT ACTIVITY METERS";
+      position: absolute;
+      top: 6px;
+      left: 10px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+
+    .viz-bar {
+      width: 12px;
+      height: 6%;
+      background: linear-gradient(to top, var(--accent-secondary), var(--accent-primary));
+      border-radius: 3px 3px 0 0;
+      transition: height 0.1s ease;
+    }
+
+    /* Active Bot Profile Area */
+    .bot-profile-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+    }
+
+    .bot-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      box-shadow: var(--glow-intensity);
+    }
+
+    .bot-details {
+      flex: 1;
+    }
+
+    .bot-status-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-color);
+    }
+
+    .bot-status-sub {
+      font-size: 0.75rem;
+      color: var(--accent-secondary);
+      font-weight: 600;
+    }
+
+    /* Chat Messages Stream Area */
+    .chat-stream {
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      height: 340px;
+      overflow-y: auto;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .message-bubble {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.88rem;
+      line-height: 1.45;
+      animation: bubbleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      word-wrap: break-word;
+      position: relative;
+    }
+
+    .message-user {
+      align-self: flex-end;
+      background: var(--user-bubble-bg);
+      color: var(--text-color);
+      border-bottom-right-radius: 4px;
+      border: 1px solid var(--card-border);
+    }
+
+    .message-bot {
+      align-self: flex-start;
+      background: var(--bot-bubble-bg);
+      color: var(--text-color);
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--card-border);
+    }
+
+    .bubble-sender {
+      font-size: 0.65rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .message-bot .bubble-sender {
+      color: var(--accent-primary);
+    }
+
+    .message-user .bubble-sender {
+      color: var(--accent-secondary);
+    }
+
+    /* Chat Input Bar Row */
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-input {
+      flex: 1;
+      height: 48px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text-color);
+      padding: 0 16px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .icon-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .send-btn {
+      background: var(--accent-primary);
+    }
+
+    .send-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+      box-shadow: var(--glow-intensity);
+    }
+
+    .mic-btn {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    }
+
+    .mic-btn.listening {
+      background: linear-gradient(135deg, #ef4444, #f43f5e);
+      animation: micPulse 1.5s infinite ease-in-out;
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.4);
+    }
+
+    .mic-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    /* Preset prompt chips */
+    .chips-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .chips-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-color);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+    }
+
+    .chip:hover {
+      background: rgba(168, 85, 247, 0.1);
+      border-color: var(--accent-primary);
+      transform: translateY(-1px);
+    }
+
+    /* Right Column: soundboard */
+    .widget-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Interactive Pads Soundboard */
+    .soundboard-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pads-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .pad {
+      height: 70px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-color);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+
+    .pad-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .pad-key {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    /* Interactive pad color accents */
+    .pad-1 { border-left: 3px solid var(--accent-tertiary); }
+    .pad-2 { border-left: 3px solid var(--accent-primary); }
+    .pad-3 { border-left: 3px solid var(--accent-secondary); }
+
+    .pad:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .pad:active, .pad.active {
+      transform: scale(0.95);
+      background: var(--accent-primary);
+      border-color: transparent;
+      box-shadow: var(--glow-intensity);
+    }
+
+    /* Footer Details */
+    footer {
+      width: 100%;
+      max-width: 1200px;
+      text-align: center;
+      padding: 24px 0;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      border-top: 1px solid var(--card-border);
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* Animations */
+    @keyframes logoPulse {
+      0%, 100% {
+        box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 25px rgba(236, 72, 153, 0.7);
+        transform: scale(1.04);
+      }
+    }
+
+    @keyframes micPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.02);
+      }
+    }
+
+    @keyframes bubbleIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">
+        <!-- SVG Lightning/Bot Icon -->
+        <svg viewBox="0 0 24 24">
+          <path d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.7-1.3-3-3-3S9 3.3 9 5H6c-1.1 0-2 .9-2 2v2c-1.7 0-3 1.3-3 3s1.3 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.7 0 3-1.3 3-3s-1.3-3-3-3zm-2 10H6V7h12v12zm-9-6c-.8 0-1.5-.7-1.5-1.5S8.2 10 9 10s1.5.7 1.5 1.5S9.8 13 9 13zm6 0c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm-6 3h6v1.5H9V16z"/>
+        </svg>
+      </div>
+      <div class="brand-title">
+        <h1>HYPE BOT 3000</h1>
+        <p>Conversational Hype Chatbot & Dynamic Soundboard</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <!-- Dark/Light Theme Toggle -->
+      <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle Theme">
+        <svg id="themeIcon" viewBox="0 0 24 24">
+          <!-- Moon Icon for Dark Mode -->
+          <path d="M12.1 22c-5.5 0-10-4.5-10-10 0-4.8 3.5-8.9 8.2-9.8.5-.1 1 .3.9.8-.1.4-.4.8-.8 1C8.1 4.9 6.6 7.2 6.6 10c0 4.1 3.3 7.4 7.4 7.4 2.8 0 5.1-1.5 6.1-3.8.2-.4.6-.7 1-.8.6-.1 1 .4.8.9-.9 4.7-5 8.3-9.8 8.3z"/>
+        </svg>
+        <span id="themeText">Light Mode</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <div class="container">
+
+    <!-- Left Column: Conversational Chatbot Console -->
+    <main class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24"><path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v12l4-4h10c.55 0 1-.45 1-1z"/></svg>
+          HYPE MESSENGER
+        </div>
+        <div id="botStatus" style="font-size: 0.75rem; color: var(--accent-secondary); font-weight: bold; letter-spacing: 0.5px;">BOT IDLE</div>
+      </div>
+
+      <div class="messenger-wrapper">
+        <!-- Live equalizing bars -->
+        <div class="visualizer-container" id="visualizer">
+          <!-- Generated dynamically via JS -->
+        </div>
+
+        <!-- Bot Active Profile Info -->
+        <div class="bot-profile-header">
+          <div class="bot-avatar" id="botAvatar">🤖</div>
+          <div class="bot-details">
+            <div class="bot-status-title" id="botAvatarName">Hype Bot</div>
+            <div class="bot-status-sub">Ready to motivate you!</div>
+          </div>
+        </div>
+
+        <!-- Chat Bubble Stream Area -->
+        <div class="chat-stream" id="chatStream">
+          <div class="message-bubble message-bot">
+            <div class="bubble-sender">HYPE BOT</div>
+            Hey friend! Welcome to HYPE BOT 3000! Drop an achievement, score, or goal you accomplished today. Use the soundboard keys to trigger awesome sounds!
+          </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="chat-input-row">
+          <button class="icon-btn mic-btn" id="micBtn" title="Speak into microphone">
+            <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.6V21h2v-3.4c3.28-.4 6-3.18 6-6.6h-1.7z"/></svg>
+          </button>
+          <input type="text" class="chat-input" id="chatInput" placeholder="Type what you did today (e.g. 'I coded 5 hours non-stop')...">
+          <button class="icon-btn send-btn" id="sendBtn" title="Send message">
+            <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+
+        <!-- Preset Achievements Buttons -->
+        <div class="chips-section">
+          <div class="chips-title">Quick Achievements Boosters</div>
+          <div class="chips-grid">
+            <button class="chip" onclick="triggerPreset('I completed all my coding goals!')">💻 Built some awesome code!</button>
+            <button class="chip" onclick="triggerPreset('I went to the gym for an intense workout!')">💪 Hit a new gym PR!</button>
+            <button class="chip" onclick="triggerPreset('I cooked a healthy delicious meal.')">🥗 Nutritious cooking!</button>
+            <button class="chip" onclick="triggerPreset('I feel super unmotivated and need a spark.')">⚡ Spark my battery!</button>
+            <button class="chip" onclick="triggerPreset('My team just won our match!')">🏆 Clean victory!</button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Right Column: soundboard -->
+    <aside class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+          SOUNDBOARD
+        </div>
+      </div>
+
+      <div class="widget-panel">
+
+        <!-- Interactive Soundboard Pads -->
+        <div class="soundboard-section">
+          <div class="chips-title" style="margin-bottom: 6px;">SOUNDBOARD SFX (Q - E)</div>
+          <div class="pads-grid" id="padsGrid">
+            <button class="pad pad-1" data-pad="0" onclick="triggerSFX('airhorn')">
+              <span class="pad-label">Airhorn</span>
+              <span class="pad-key">Q</span>
+            </button>
+            <button class="pad pad-2" data-pad="1" onclick="triggerSFX('scratch')">
+              <span class="pad-label">Scratch</span>
+              <span class="pad-key">W</span>
+            </button>
+            <button class="pad pad-3" data-pad="2" onclick="triggerSFX('bassdrop')">
+              <span class="pad-label">Bass Drop</span>
+              <span class="pad-key">E</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- App Footer -->
+  <footer>
+    <p>🤖 Conversational Hype Bot 3000 online and fully responsive 🤖</p>
+    <p>Keyboard triggers: Soundboard (Q, W, E)</p>
+  </footer>
+
+  <script>
+    // --- 1. THEME TOGGLE & PERSISTENCE ---
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeText = document.getElementById('themeText');
+
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeUI(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeUI(newTheme);
+    });
+
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeText.textContent = "Dark Mode";
+        themeIcon.innerHTML = `<path d="M12.1 22c-5.5 0-10-4.5-10-10 0-4.8 3.5-8.9 8.2-9.8.5-.1 1 .3.9.8-.1.4-.4.8-.8 1C8.1 4.9 6.6 7.2 6.6 10c0 4.1 3.3 7.4 7.4 7.4 2.8 0 5.1-1.5 6.1-3.8.2-.4.6-.7 1-.8.6-.1 1 .4.8.9-.9 4.7-5 8.3-9.8 8.3z"/>`;
+      } else {
+        themeText.textContent = "Light Mode";
+        themeIcon.innerHTML = `<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.38.39-1.02 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.38-.38.38-1.02 0-1.41z"/>`;
+      }
+    }
+
+
+    // --- 2. WEB AUDIO API ---
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Dynamic Visualizer Bars
+    const visualizer = document.getElementById('visualizer');
+    const totalBars = 32;
+    for (let i = 0; i < totalBars; i++) {
+      const bar = document.createElement('div');
+      bar.className = 'viz-bar';
+      visualizer.appendChild(bar);
+    }
+
+    let vizInterval = null;
+    function pulseVisualizer(active, durationMs = 1500) {
+      if (!active) {
+        if (vizInterval) clearInterval(vizInterval);
+        document.querySelectorAll('.viz-bar').forEach(bar => bar.style.height = '6%');
+        return;
+      }
+      if (vizInterval) clearInterval(vizInterval);
+      const startTime = Date.now();
+
+      vizInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        if (elapsed > durationMs && durationMs > 0) {
+          pulseVisualizer(false);
+          return;
+        }
+        document.querySelectorAll('.viz-bar').forEach(bar => {
+          const randomHeight = Math.floor(Math.random() * 80) + 10;
+          bar.style.height = `${randomHeight}%`;
+        });
+      }, 70);
+    }
+
+
+    // --- 3. PREMIUM SOUND EFFECTS ---
+    function triggerSFX(type) {
+      initAudio();
+      switch(type) {
+        case 'airhorn': playAirhorn(); break;
+        case 'scratch': playScratch(); break;
+        case 'bassdrop': playBassDrop(); break;
+      }
+    }
+
+    function playAirhorn() {
+      const duration = 0.8;
+      const baseFreq = 660;
+      const offsets = [0, 4, -4];
+
+      offsets.forEach(offset => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(baseFreq + offset, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(baseFreq - 120, audioCtx.currentTime + duration);
+
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 0.05);
+        gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.4);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      });
+      pulseVisualizer(true, 800);
+    }
+
+    function playScratch() {
+      const duration = 0.45;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+      osc.frequency.linearRampToValueAtTime(1500, audioCtx.currentTime + 0.15);
+      osc.frequency.linearRampToValueAtTime(130, audioCtx.currentTime + 0.3);
+      osc.frequency.linearRampToValueAtTime(750, audioCtx.currentTime + 0.45);
+
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(850, audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(0, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.25, audioCtx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+      pulseVisualizer(true, 450);
+    }
+
+    function playBassDrop() {
+      const duration = 1.8;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + duration);
+
+      gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+      pulseVisualizer(true, 1800);
+    }
+
+
+    // --- 4. CONVERSATIONAL MESSENGER ---
+    const chatStream = document.getElementById('chatStream');
+    const botStatus = document.getElementById('botStatus');
+
+    function appendMessage(sender, text) {
+      const bubble = document.createElement('div');
+      bubble.className = `message-bubble message-${sender}`;
+
+      const meta = document.createElement('div');
+      meta.className = 'bubble-sender';
+      meta.textContent = sender === 'bot' ? 'HYPE BOT' : 'YOU';
+      bubble.appendChild(meta);
+
+      const contentSpan = document.createElement('span');
+      contentSpan.textContent = text; // Secure from XSS
+      bubble.appendChild(contentSpan);
+
+      chatStream.appendChild(bubble);
+      chatStream.scrollTop = chatStream.scrollHeight;
+    }
+
+    function speakHype(plainText) {
+      botStatus.textContent = "BOT TYPING";
+      botStatus.style.color = "var(--accent-tertiary)";
+      pulseVisualizer(true, 1200);
+
+      setTimeout(() => {
+        appendMessage('bot', plainText);
+        botStatus.textContent = "BOT IDLE";
+        botStatus.style.color = "var(--accent-secondary)";
+        pulseVisualizer(false);
+      }, 600);
+    }
+
+
+    // --- 5. LISTEN (VOICE INPUT SPEECH RECOGNITION) ---
+    const micBtn = document.getElementById('micBtn');
+    let recognition = null;
+    let isListening = false;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechGen = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechGen();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        isListening = true;
+        micBtn.classList.add('listening');
+        botStatus.textContent = "BOT LISTENING";
+        botStatus.style.color = "#ef4444";
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        handleUserSpeech(transcript);
+      };
+
+      recognition.onerror = (e) => {
+        console.error("Speech Recognition Error", e);
+        stopListeningState();
+      };
+
+      recognition.onend = () => {
+        stopListeningState();
+      };
+    } else {
+      micBtn.style.opacity = "0.5";
+      micBtn.title = "Microphone input not supported by browser";
+    }
+
+    function stopListeningState() {
+      isListening = false;
+      micBtn.classList.remove('listening');
+      botStatus.textContent = "BOT IDLE";
+      botStatus.style.color = "var(--accent-secondary)";
+    }
+
+    micBtn.addEventListener('click', () => {
+      initAudio();
+      if (!recognition) {
+        appendMessage('bot', "Web Speech Recognition isn't supported on this browser version. Use the chat bar below!");
+        return;
+      }
+      if (isListening) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    });
+
+    // Handle user input text/voice
+    function handleUserSpeech(text) {
+      if (!text.trim()) return;
+      appendMessage('user', text);
+
+      const lowercaseText = text.toLowerCase();
+      let soundToTrigger = null;
+      let replyMessage = "";
+
+      if (lowercaseText.includes('tired') || lowercaseText.includes('sad') || lowercaseText.includes('exhausted') || lowercaseText.includes('give up') || lowercaseText.includes('need a spark')) {
+        soundToTrigger = 'bassdrop';
+        replyMessage = "OH NO! I detected you are feeling a bit drained. Stand tall, roll your shoulders back! You have a 100% survival rate of tough days. You are an absolute warrior! LET'S SHINE!";
+      } else if (lowercaseText.includes('code') || lowercaseText.includes('program') || lowercaseText.includes('computer') || lowercaseText.includes('built')) {
+        soundToTrigger = 'scratch';
+        replyMessage = "WHOA! An absolute code wizard in action! Designing structures, squashin' bugs, compiling absolute digital gold! YOU GO, DEVELOPER!";
+      } else if (lowercaseText.includes('win') || lowercaseText.includes('victor') || lowercaseText.includes('success') || lowercaseText.includes('workout') || lowercaseText.includes('gym')) {
+        soundToTrigger = 'airhorn';
+        replyMessage = "BOOM! Incredible level of dedication and hustle! You just dominated that goal! Take a moment to celebrate yourself, you elite champion!";
+      } else if (lowercaseText.includes('cook') || lowercaseText.includes('eat') || lowercaseText.includes('meal')) {
+        soundToTrigger = 'scratch';
+        replyMessage = "YUM! Excellent nutrition fueling a superior mind! Chef-level productivity in the kitchen today! Keep cooking gold!";
+      } else {
+        const fallbacks = [
+          `Oh wow! You told me: "${text}". That is absolutely elite tier performance!`,
+          `I am analyzing your progress and the metrics are completely off the charts! Keep shining!`,
+          `You're demonstrating elite consistency. The momentum is firmly in your favor now!`,
+          `Magnificent! Every small action is building your monumental empire. Let's get it!`
+        ];
+        replyMessage = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+      }
+
+      if (soundToTrigger) {
+        setTimeout(() => triggerSFX(soundToTrigger), 100);
+      }
+      setTimeout(() => speakHype(replyMessage), 450);
+    }
+
+
+    // --- 6. CHAT INPUT & PRESET BOOST CHIPS ---
+    const sendBtn = document.getElementById('sendBtn');
+    const chatInput = document.getElementById('chatInput');
+
+    sendBtn.addEventListener('click', () => {
+      sendTextInput();
+    });
+
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        sendTextInput();
+      }
+    });
+
+    function sendTextInput() {
+      const val = chatInput.value.trim();
+      if (val) {
+        handleUserSpeech(val);
+        chatInput.value = "";
+      }
+    }
+
+    function triggerPreset(text) {
+      handleUserSpeech(text);
+    }
+
+
+    // --- 7. PHYSICAL KEYBOARD BINDINGS ---
+    const soundboardKeys = {
+      'q': '0', 'w': '1', 'e': '2'
+    };
+
+    const activeKeys = {};
+
+    window.addEventListener('keydown', (e) => {
+      const key = e.key.toLowerCase();
+      if (activeKeys[key]) return;
+      if (document.activeElement === chatInput) return;
+
+      if (soundboardKeys[key] !== undefined) {
+        initAudio();
+        const padIndex = soundboardKeys[key];
+        const padBtn = document.querySelector(`.pad[data-pad="${padIndex}"]`);
+        if (padBtn) {
+          padBtn.classList.add('active');
+          padBtn.click();
+        }
+        activeKeys[key] = true;
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      const key = e.key.toLowerCase();
+      activeKeys[key] = false;
+
+      if (soundboardKeys[key] !== undefined) {
+        const padIndex = soundboardKeys[key];
+        const padBtn = document.querySelector(`.pad[data-pad="${padIndex}"]`);
+        if (padBtn) padBtn.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>
