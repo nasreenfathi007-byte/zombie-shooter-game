@@ -164,18 +164,22 @@
       <div class="lg:col-span-2 flex flex-col gap-8">
 
         <!-- Mode Tabs -->
-        <div class="flex p-1 rounded-xl bg-slate-200/60 dark:bg-slate-800/60 border border-slate-300/30 dark:border-slate-700/30">
-          <button id="tabJsonMode" class="flex-1 py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-slate-100 shadow-sm">
+        <div class="flex p-1 rounded-xl bg-slate-200/60 dark:bg-slate-800/60 border border-slate-300/30 dark:border-slate-700/30 overflow-x-auto">
+          <button id="tabJsonMode" class="flex-1 min-w-[120px] py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-slate-100 shadow-sm">
             <i class="fa-solid fa-file-code"></i>
-            Structured JSON Mode
+            Structured JSON
           </button>
-          <button id="tabDocMode" class="flex-1 py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100">
+          <button id="tabDocMode" class="flex-1 min-w-[120px] py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100">
             <i class="fa-solid fa-file-pdf"></i>
-            Document split-screen (PDF/Image)
+            Document splitscreen
           </button>
-          <button id="tabCreatorMode" class="flex-1 py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100">
+          <button id="tabCreatorMode" class="flex-1 min-w-[120px] py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
-            Visual Test Creator
+            Test Creator
+          </button>
+          <button id="tabBlueprintMode" class="flex-1 min-w-[120px] py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100">
+            <i class="fa-solid fa-cubes-stacked"></i>
+            Exam Blueprint
           </button>
         </div>
 
@@ -294,6 +298,70 @@
                 <!-- Question cards added by visual creator -->
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Tab Panel: Exam Blueprint Configuration -->
+        <div id="panelBlueprintMode" class="glass-card rounded-2xl p-6 flex flex-col gap-6 hidden">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Exam Blueprint Configurator</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Quickly define section layouts, questions count, and topic breakdowns to dynamically generate OMR sheets.</p>
+          </div>
+
+          <!-- Preloaded Blueprint Presets -->
+          <div class="flex flex-col gap-3">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Select Preset Exam Structure</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button onclick="applyBlueprintPreset('jee')" class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-left hover:border-brand-500 hover:bg-brand-500/5 transition-all">
+                <span class="block text-xs font-extrabold text-brand-500 uppercase tracking-wider">JEE Main</span>
+                <span class="block text-xs font-bold text-slate-700 dark:text-slate-200 mt-1">Physics & Chem Matrix</span>
+                <span class="block text-[10px] text-slate-400 mt-0.5">15 Questions (+4/-1)</span>
+              </button>
+              <button onclick="applyBlueprintPreset('sat')" class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-left hover:border-brand-500 hover:bg-brand-500/5 transition-all">
+                <span class="block text-xs font-extrabold text-brand-500 uppercase tracking-wider">SAT Standard</span>
+                <span class="block text-xs font-bold text-slate-700 dark:text-slate-200 mt-1">Evidence Reading Grid</span>
+                <span class="block text-[10px] text-slate-400 mt-0.5">10 Questions (1/-0.25)</span>
+              </button>
+              <button onclick="applyBlueprintPreset('mini')" class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-left hover:border-brand-500 hover:bg-brand-500/5 transition-all">
+                <span class="block text-xs font-extrabold text-brand-500 uppercase tracking-wider">Mini Speed Mock</span>
+                <span class="block text-xs font-bold text-slate-700 dark:text-slate-200 mt-1">General Aptitude test</span>
+                <span class="block text-[10px] text-slate-400 mt-0.5">5 Questions (1/0)</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-200 dark:border-slate-800 pt-4 flex flex-col gap-4">
+            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Custom Blueprint Parameters</h4>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Total Questions</label>
+                <input type="number" id="bpTotalQuestions" value="10" min="1" max="100" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-brand-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Default Correct Score</label>
+                <input type="number" id="bpCorrectScore" value="1" step="0.25" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-brand-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Default Negative Score</label>
+                <input type="number" id="bpIncorrectScore" value="0" step="0.25" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-brand-500">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Subject / Section Title</label>
+                <input type="text" id="bpSectionTitle" placeholder="Physics Mechanics" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-brand-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Blueprint Timer (Minutes)</label>
+                <input type="number" id="bpTimerMinutes" value="20" min="1" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-brand-500">
+              </div>
+            </div>
+
+            <button onclick="generateFromBlueprint()" class="w-full mt-2 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2">
+              <i class="fa-solid fa-gears"></i> Apply Blueprint Configuration
+            </button>
           </div>
         </div>
 
@@ -653,22 +721,25 @@
     const tabJsonMode = document.getElementById('tabJsonMode');
     const tabDocMode = document.getElementById('tabDocMode');
     const tabCreatorMode = document.getElementById('tabCreatorMode');
+    const tabBlueprintMode = document.getElementById('tabBlueprintMode');
 
     const panelJsonMode = document.getElementById('panelJsonMode');
     const panelDocMode = document.getElementById('panelDocMode');
     const panelCreatorMode = document.getElementById('panelCreatorMode');
+    const panelBlueprintMode = document.getElementById('panelBlueprintMode');
 
     // Tab switcher listeners
     tabJsonMode.addEventListener('click', () => switchTab('json'));
     tabDocMode.addEventListener('click', () => switchTab('doc'));
     tabCreatorMode.addEventListener('click', () => switchTab('creator'));
+    tabBlueprintMode.addEventListener('click', () => switchTab('blueprint'));
 
     function switchTab(tab) {
       activeTab = tab;
-      [tabJsonMode, tabDocMode, tabCreatorMode].forEach(el => {
+      [tabJsonMode, tabDocMode, tabCreatorMode, tabBlueprintMode].forEach(el => {
         el.className = "flex-1 py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100";
       });
-      [panelJsonMode, panelDocMode, panelCreatorMode].forEach(el => el.classList.add('hidden'));
+      [panelJsonMode, panelDocMode, panelCreatorMode, panelBlueprintMode].forEach(el => el.classList.add('hidden'));
 
       if (tab === 'json') {
         tabJsonMode.className = "flex-1 py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-slate-100 shadow-sm";
@@ -679,6 +750,9 @@
       } else if (tab === 'creator') {
         tabCreatorMode.className = "flex-1 py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-slate-100 shadow-sm";
         panelCreatorMode.classList.remove('hidden');
+      } else if (tab === 'blueprint') {
+        tabBlueprintMode.className = "flex-1 py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-slate-100 shadow-sm";
+        panelBlueprintMode.classList.remove('hidden');
       }
     }
 
@@ -974,6 +1048,79 @@
       currentDocZoom = Math.max(50, Math.min(200, currentDocZoom + amount));
       document.getElementById('zoomPercent').textContent = `${currentDocZoom}%`;
       document.getElementById('documentVisualMock').style.transform = `scale(${currentDocZoom / 100})`;
+    }
+
+    // Exam Blueprint Presets
+    function applyBlueprintPreset(type) {
+      const totalInput = document.getElementById('bpTotalQuestions');
+      const correctInput = document.getElementById('bpCorrectScore');
+      const incorrectInput = document.getElementById('bpIncorrectScore');
+      const titleInput = document.getElementById('bpSectionTitle');
+      const timerInput = document.getElementById('bpTimerMinutes');
+
+      if (type === 'jee') {
+        totalInput.value = 15;
+        correctInput.value = 4;
+        incorrectInput.value = -1;
+        titleInput.value = "JEE Physics & Chem";
+        timerInput.value = 60;
+      } else if (type === 'sat') {
+        totalInput.value = 10;
+        correctInput.value = 1;
+        incorrectInput.value = -0.25;
+        titleInput.value = "SAT Evidence Reading";
+        timerInput.value = 20;
+      } else if (type === 'mini') {
+        totalInput.value = 5;
+        correctInput.value = 1;
+        incorrectInput.value = 0;
+        titleInput.value = "Aptitude Speed Mock";
+        timerInput.value = 10;
+      }
+    }
+
+    // Generate test configuration dynamically from custom Blueprint parameters
+    function generateFromBlueprint() {
+      const totalQuestions = parseInt(document.getElementById('bpTotalQuestions').value) || 10;
+      const correctScore = parseFloat(document.getElementById('bpCorrectScore').value) || 1.0;
+      const incorrectScore = parseFloat(document.getElementById('bpIncorrectScore').value) || 0.0;
+      const sectionTitle = document.getElementById('bpSectionTitle').value.trim() || "Mechanics Blueprint Test";
+      const timerMinutes = parseInt(document.getElementById('bpTimerMinutes').value) || 20;
+
+      // 1. Sync timer parameters
+      document.getElementById('customHours').value = Math.floor(timerMinutes / 60);
+      document.getElementById('customMinutes').value = timerMinutes % 60;
+
+      // 2. Sync scoring configurations
+      document.getElementById('scoreCorrect').value = correctScore;
+      document.getElementById('scoreIncorrect').value = incorrectScore;
+
+      // 3. Populate matching digital OMR bubble answer pad rows
+      docOmrRows = [];
+      document.getElementById('omrContainer').innerHTML = '';
+      for (let i = 0; i < totalQuestions; i++) {
+        addOmrRow();
+      }
+
+      // 4. Register mock document data for document splitscreen
+      uploadedDocData = {
+        name: sectionTitle + " (Blueprint)",
+        size: "Dynamic",
+        type: "Exam Blueprint"
+      };
+
+      document.getElementById('docMetaCard').classList.remove('hidden');
+      document.getElementById('docFileName').textContent = uploadedDocData.name;
+      document.getElementById('docFileDetails').textContent = "Exam Blueprint Applied - Ready to Launch!";
+
+      // 5. Navigate back to OMR Splitscreen mode tab so they can review their generated sheet
+      switchTab('doc');
+
+      alert(`Blueprint '${sectionTitle}' Applied Successfully!\n` +
+            `- Dynamic OMR bubble pad with ${totalQuestions} questions generated.\n` +
+            `- Score rules set to ${correctScore} (Correct) and ${incorrectScore} (Incorrect).\n` +
+            `- Timer configured to ${timerMinutes} minutes.\n\n` +
+            `Press 'Launch Mock Session' on the right panel to begin!`);
     }
 
     // Helper to generate sample test file
@@ -1408,7 +1555,16 @@
       evaluateAndGradeTest();
     }
 
-    function evaluateAndGradeTest() {
+    function overrideGrading(qNum, isCorrectState) {
+      if (!currentSession.evaluation) {
+        currentSession.evaluation = {};
+      }
+      currentSession.evaluation[qNum] = isCorrectState;
+      // Re-run evaluation, signaling it is a retroactive override/update
+      evaluateAndGradeTest(true);
+    }
+
+    function evaluateAndGradeTest(isRetroactiveUpdate = false) {
       const positiveMark = parseFloat(document.getElementById('scoreCorrect').value) || 1.0;
       const negativeMark = parseFloat(document.getElementById('scoreIncorrect').value) || 0.0;
 
@@ -1418,13 +1574,23 @@
       let incorrectAnswersCount = 0;
       let unansweredCount = 0;
 
+      if (!currentSession.evaluation) {
+        currentSession.evaluation = {};
+      }
+
       const reviewGrid = document.getElementById('resReviewGrid');
       reviewGrid.innerHTML = '';
 
       currentSession.questions.forEach((q, idx) => {
         const qNum = idx + 1;
         const userChoice = currentSession.answers[qNum] || '';
-        const isCorrect = (userChoice === q.correctAnswer);
+
+        // Initialize evaluation mapping on first run if not present
+        if (currentSession.evaluation[qNum] === undefined) {
+          currentSession.evaluation[qNum] = (userChoice !== '' && userChoice === q.correctAnswer);
+        }
+
+        const isCorrect = currentSession.evaluation[qNum];
 
         if (!userChoice) {
           unansweredCount++;
@@ -1433,7 +1599,7 @@
           scoreGained += positiveMark;
         } else {
           incorrectAnswersCount++;
-          scoreGained += negativeMark; // subtract or modify score (negativeMark is typically negative, like -1)
+          scoreGained += negativeMark;
         }
 
         // Build Review Detail Cards
@@ -1448,7 +1614,7 @@
           let optClass = "text-slate-600 dark:text-slate-400";
           let badgeHtml = '';
 
-          if (optLetter === q.correctAnswer) {
+          if (q.correctAnswer && optLetter === q.correctAnswer) {
             optClass = "text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5";
             badgeHtml = `<span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-bold">Correct Key</span>`;
           } else if (optLetter === userChoice) {
@@ -1486,6 +1652,24 @@
               ${q.explanation}
             </div>
           ` : ''}
+
+          <!-- Dynamic Self-Grading Toggles -->
+          ${userChoice !== '' ? `
+            <div class="flex items-center justify-between border-t border-slate-200/50 dark:border-slate-800/50 pt-2.5 mt-2">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-user-check text-brand-500"></i>
+                Self-Grading Override:
+              </span>
+              <div class="flex gap-2">
+                <button onclick="overrideGrading(${qNum}, true)" class="px-2.5 py-1.5 rounded-lg transition-all text-xs font-extrabold flex items-center gap-1 ${isCorrect ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/20' : 'bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'}" title="Mark Correct">
+                  <i class="fa-solid fa-circle-check text-xs"></i> Correct
+                </button>
+                <button onclick="overrideGrading(${qNum}, false)" class="px-2.5 py-1.5 rounded-lg transition-all text-xs font-extrabold flex items-center gap-1 ${!isCorrect ? 'bg-red-500 text-white shadow-sm shadow-red-500/20' : 'bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'}" title="Mark Incorrect">
+                  <i class="fa-solid fa-circle-xmark text-xs"></i> Incorrect
+                </button>
+              </div>
+            </div>
+          ` : ''}
         `;
         reviewGrid.appendChild(card);
       });
@@ -1508,7 +1692,7 @@
       document.getElementById('resRatio').textContent = `${correctAnswersCount} Correct / ${incorrectAnswersCount} Incorrect`;
       document.getElementById('resTimeSpent').textContent = timeSpentStr;
 
-      // Save attempt entry into history log
+      // Save attempt entry into history log (or update if retroactive)
       const historyItem = {
         title: currentSession.testTitle,
         category: currentSession.category,
@@ -1517,7 +1701,7 @@
         timeSpent: timeSpentStr,
         timestamp: new Date().toLocaleDateString()
       };
-      saveToHistoryLog(historyItem);
+      saveToHistoryLog(historyItem, isRetroactiveUpdate);
 
       // Hide Active Test, View results
       document.getElementById('activeTestSection').classList.add('hidden');
@@ -1525,13 +1709,17 @@
     }
 
     // Storage and rendering of past tries
-    function saveToHistoryLog(item) {
+    function saveToHistoryLog(item, isRetroactiveUpdate = false) {
       let currentLog = [];
       try {
         currentLog = JSON.parse(localStorage.getItem('mockmaster_history')) || [];
       } catch(e) {}
 
-      currentLog.unshift(item);
+      if (isRetroactiveUpdate && currentLog.length > 0 && currentLog[0].title === item.title) {
+        currentLog[0] = item;
+      } else {
+        currentLog.unshift(item);
+      }
       localStorage.setItem('mockmaster_history', JSON.stringify(currentLog));
 
       // Refresh Visual Dashboard History list
@@ -1597,6 +1785,28 @@
 
     // Call on body startup
     renderHistoryLog();
+
+    // Theme Setup & Toggle Event Listeners
+    const themeToggleBtn = document.getElementById('themeToggle');
+    function applyTheme() {
+      if (localStorage.getItem('theme') === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+    applyTheme();
+
+    themeToggleBtn.addEventListener('click', () => {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
   </script>
 </body>
 </html>
