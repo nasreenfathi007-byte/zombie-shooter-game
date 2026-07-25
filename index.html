@@ -195,6 +195,10 @@
             <i class="fa-solid fa-cubes-stacked"></i>
             Exam Blueprint
           </button>
+          <button id="tabCopyPasteMode" class="flex-1 min-w-[120px] py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100">
+            <i class="fa-solid fa-paste"></i>
+            Copy Paste Test
+          </button>
         </div>
 
         <!-- Tab Panel: Structured JSON -->
@@ -379,6 +383,48 @@
           </div>
         </div>
 
+        <!-- Tab Panel: Copy-Paste Text Mode -->
+        <div id="panelCopyPasteMode" class="glass-card rounded-2xl p-6 flex flex-col gap-6 hidden">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">Copy & Paste Exam Paper</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Paste a traditional text-formatted exam paper (supporting Roman numeral headings like "I. Short Answers"). Our engine parses sections and sets up questions instantly.</p>
+          </div>
+
+          <div class="flex flex-col gap-4">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Pasted Exam Title</label>
+              <input type="text" id="cpTitle" placeholder="History Midterm Exam" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-brand-500 font-medium">
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Paste Full Exam Content Below</label>
+                <button onclick="loadSampleCopyPaste()" class="text-xs text-brand-500 hover:underline flex items-center gap-1">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Load Sample Roman Exam
+                </button>
+              </div>
+              <textarea id="copyPasteRawText" rows="12" placeholder="I. Choose the correct answer:&#10;1. What is the SI unit of force?&#10;A) Joule&#10;B) Newton&#10;C) Watt&#10;D) Pascal&#10;&#10;II. Short Answers:&#10;2. Define velocity.&#10;3. State Newton's first law of motion.&#10;&#10;III. Long Questions:&#10;4. Explain the theory of relativity and its modern-day applications in GPS systems." class="w-full px-4 py-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-brand-500 font-mono leading-relaxed text-slate-700 dark:text-slate-300"></textarea>
+            </div>
+
+            <button onclick="parseCopyPastedTest()" class="w-full py-3.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold transition-all shadow-md flex items-center justify-center gap-2">
+              <i class="fa-solid fa-puzzle-piece"></i> Parse and Load Exam Structure
+            </button>
+          </div>
+
+          <!-- Parsed preview workspace -->
+          <div id="cpWorkspaceContainer" class="hidden border-t border-slate-200 dark:border-slate-800 pt-5 mt-2 flex flex-col gap-4">
+            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+              <i class="fa-solid fa-square-poll-horizontal text-brand-500"></i>
+              Interactive Review Workspace
+            </h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Review, fine-tune stems, adjust types, and supply correct keys below before launching.</p>
+
+            <div id="copyPastePreviewWorkspace" class="flex flex-col gap-4 max-h-[420px] overflow-y-auto pr-2">
+              <!-- Dynamically populated question preview cards -->
+            </div>
+          </div>
+        </div>
+
         <!-- Global Session History Tracker (Bottom left card) -->
         <div id="historyLogCard" class="glass-card rounded-2xl p-6 flex flex-col gap-4">
           <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2.5">
@@ -520,6 +566,9 @@
                   <span>Mark for Review</span>
                 </button>
               </div>
+
+              <!-- Roman Section Title Banner -->
+              <div id="questionRomanTitleBadge" class="hidden mb-3 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 text-xs font-extrabold tracking-wide uppercase"></div>
 
               <h4 id="questionTextDisplay" class="text-lg font-bold text-slate-800 dark:text-slate-100 mb-6 leading-relaxed">
                 What is the unit of electric force?
@@ -748,24 +797,27 @@
     const tabDocMode = document.getElementById('tabDocMode');
     const tabCreatorMode = document.getElementById('tabCreatorMode');
     const tabBlueprintMode = document.getElementById('tabBlueprintMode');
+    const tabCopyPasteMode = document.getElementById('tabCopyPasteMode');
 
     const panelJsonMode = document.getElementById('panelJsonMode');
     const panelDocMode = document.getElementById('panelDocMode');
     const panelCreatorMode = document.getElementById('panelCreatorMode');
     const panelBlueprintMode = document.getElementById('panelBlueprintMode');
+    const panelCopyPasteMode = document.getElementById('panelCopyPasteMode');
 
     // Tab switcher listeners
     tabJsonMode.addEventListener('click', () => switchTab('json'));
     tabDocMode.addEventListener('click', () => switchTab('doc'));
     tabCreatorMode.addEventListener('click', () => switchTab('creator'));
     tabBlueprintMode.addEventListener('click', () => switchTab('blueprint'));
+    tabCopyPasteMode.addEventListener('click', () => switchTab('copypaste'));
 
     function switchTab(tab) {
       activeTab = tab;
-      [tabJsonMode, tabDocMode, tabCreatorMode, tabBlueprintMode].forEach(el => {
+      [tabJsonMode, tabDocMode, tabCreatorMode, tabBlueprintMode, tabCopyPasteMode].forEach(el => {
         el.className = "flex-1 py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100";
       });
-      [panelJsonMode, panelDocMode, panelCreatorMode, panelBlueprintMode].forEach(el => el.classList.add('hidden'));
+      [panelJsonMode, panelDocMode, panelCreatorMode, panelBlueprintMode, panelCopyPasteMode].forEach(el => el.classList.add('hidden'));
 
       if (tab === 'json') {
         tabJsonMode.className = "flex-1 py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-slate-100 shadow-sm";
@@ -779,6 +831,9 @@
       } else if (tab === 'blueprint') {
         tabBlueprintMode.className = "flex-1 py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-slate-100 shadow-sm";
         panelBlueprintMode.classList.remove('hidden');
+      } else if (tab === 'copypaste') {
+        tabCopyPasteMode.className = "flex-1 py-3 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-slate-100 shadow-sm";
+        panelCopyPasteMode.classList.remove('hidden');
       }
     }
 
@@ -1149,6 +1204,224 @@
             `Press 'Launch Mock Session' on the right panel to begin!`);
     }
 
+    // Copy-Paste Parsing State and Logic
+    let parsedCopyPasteQuestions = [];
+
+    function loadSampleCopyPaste() {
+      document.getElementById('cpTitle').value = "Science and Physics Midterm Exam";
+      document.getElementById('copyPasteRawText').value =
+        "I. Choose the correct answer:\n" +
+        "1. Which of the following is the unit of energy?\n" +
+        "A) Newton\n" +
+        "B) Joule\n" +
+        "C) Watt\n" +
+        "D) Pascal\n\n" +
+        "II. Short Answers:\n" +
+        "2. Define velocity and explain how it differs from speed.\n" +
+        "3. State Newton's first law of motion.\n\n" +
+        "III. Long Questions:\n" +
+        "4. Explain the theory of relativity and discuss its modern applications in GPS satellite systems.";
+
+      alert("Sample traditional exam loaded! Press 'Parse and Load Exam Structure' below to visualize.");
+    }
+
+    function parseCopyPastedTest() {
+      const title = document.getElementById('cpTitle').value.trim() || "Copy-Pasted Mock Exam";
+      const rawText = document.getElementById('copyPasteRawText').value;
+
+      if (!rawText.trim()) {
+        alert("Please paste some exam content first!");
+        return;
+      }
+
+      const lines = rawText.split('\n');
+      parsedCopyPasteQuestions = [];
+
+      let currentRomanLetter = 'I';
+      let currentRomanTitle = 'I. Choose the correct answer';
+      let currentSectionType = 'mcq'; // fallback default
+      let activeQuestion = null;
+      let qIdCounter = 1;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+
+        // 1. Detect Roman Numeral section heading (e.g., I. Choose..., II. Short...)
+        const romanMatch = line.match(/^\s*([IVXLCDM]+)\.\s*(.*)/i);
+        if (romanMatch) {
+          // Commit active question before transitioning
+          if (activeQuestion) {
+            parsedCopyPasteQuestions.push(activeQuestion);
+            activeQuestion = null;
+          }
+          currentRomanLetter = romanMatch[1].toUpperCase();
+          currentRomanTitle = trimmed;
+
+          const lowerTitle = trimmed.toLowerCase();
+          if (lowerTitle.includes('short') || lowerTitle.includes('define') || lowerTitle.includes('state')) {
+            currentSectionType = 'short';
+          } else if (lowerTitle.includes('long') || lowerTitle.includes('essay') || lowerTitle.includes('explain') || lowerTitle.includes('theory') || lowerTitle.includes('discuss')) {
+            currentSectionType = 'long';
+          } else {
+            currentSectionType = 'mcq';
+          }
+          continue;
+        }
+
+        // 2. Detect Question Stem starting with digits (e.g. 1. What is...)
+        const questionMatch = line.match(/^\s*(\d+)[\.\)]\s*(.*)/);
+        if (questionMatch) {
+          if (activeQuestion) {
+            parsedCopyPasteQuestions.push(activeQuestion);
+          }
+          activeQuestion = {
+            id: qIdCounter++,
+            question: questionMatch[2].trim(),
+            options: [],
+            correctAnswer: '',
+            type: currentSectionType,
+            romanLetter: currentRomanLetter,
+            romanTitle: currentRomanTitle
+          };
+          continue;
+        }
+
+        // 3. Detect MCQ Choice patterns (e.g., A) Newton or B. Joule)
+        const choiceMatch = line.match(/^\s*([A-D])[\)\.]\s*(.*)/i);
+        if (choiceMatch && activeQuestion) {
+          activeQuestion.options.push(choiceMatch[2].trim());
+          activeQuestion.type = 'mcq'; // ensure it matches MCQ if options are explicitly listed
+          continue;
+        }
+
+        // 4. Otherwise, if active question exists, append multi-line stems
+        if (activeQuestion) {
+          activeQuestion.question += ' ' + trimmed;
+        }
+      }
+
+      if (activeQuestion) {
+        parsedCopyPasteQuestions.push(activeQuestion);
+      }
+
+      if (parsedCopyPasteQuestions.length === 0) {
+        alert("We couldn't detect any questions. Please make sure questions are numbered (e.g., '1. Question Text')");
+        return;
+      }
+
+      renderCopyPasteWorkspace();
+    }
+
+    function renderCopyPasteWorkspace() {
+      const workspace = document.getElementById('copyPastePreviewWorkspace');
+      workspace.innerHTML = '';
+
+      parsedCopyPasteQuestions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = "p-5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-3";
+
+        // Options block if mcq
+        let optionsBlock = '';
+        if (q.type === 'mcq') {
+          // Ensure we have at least 4 empty option slots if none were parsed
+          while (q.options.length < 4) {
+            q.options.push(`Parsed Option ${['A', 'B', 'C', 'D'][q.options.length]}`);
+          }
+          optionsBlock = `
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+              ${[0, 1, 2, 3].map(optIdx => `
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Option ${['A', 'B', 'C', 'D'][optIdx]}</label>
+                  <input type="text" oninput="updateCPQuestionOption(${q.id}, ${optIdx}, this.value)" value="${q.options[optIdx].replace(/"/g, '&quot;')}" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-medium focus:outline-none focus:border-brand-500">
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        // Roman section banner text
+        const bannerText = q.romanTitle ? `${q.romanTitle}` : `Roman Section ${q.romanLetter}`;
+
+        div.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-700/50 pb-2">
+            <span class="px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-500 text-[10px] font-extrabold uppercase tracking-wide">
+              ${bannerText}
+            </span>
+            <div class="flex items-center gap-3">
+              <label class="text-xs font-bold text-slate-500">Type:</label>
+              <select onchange="updateCPQuestionType(${q.id}, this.value)" class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-900 text-xs font-bold border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 focus:outline-none">
+                <option value="mcq" ${q.type === 'mcq' ? 'selected' : ''}>MCQ Choice</option>
+                <option value="short" ${q.type === 'short' ? 'selected' : ''}>Short Answer</option>
+                <option value="long" ${q.type === 'long' ? 'selected' : ''}>Long Answer</option>
+              </select>
+              <button onclick="deleteCPQuestion(${q.id})" class="text-slate-400 hover:text-red-500 p-1"><i class="fa-solid fa-trash-can text-xs"></i></button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Question Description</label>
+            <input type="text" oninput="updateCPQuestionText(${q.id}, this.value)" value="${q.question.replace(/"/g, '&quot;')}" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:border-brand-500 text-slate-800 dark:text-slate-100">
+          </div>
+
+          ${optionsBlock}
+
+          <div class="flex items-center gap-4 mt-2">
+            <label class="text-xs font-bold text-slate-600 dark:text-slate-400">Correct Answer Key / Model Key:</label>
+            ${q.type === 'mcq' ? `
+              <div class="flex gap-2">
+                ${['A', 'B', 'C', 'D'].map(opt => `
+                  <button onclick="updateCPQuestionKey(${q.id}, '${opt}')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all ${q.correctAnswer === opt ? 'bg-emerald-500 text-white shadow' : 'bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200'}">
+                    ${opt}
+                  </button>
+                `).join('')}
+              </div>
+            ` : `
+              <input type="text" oninput="updateCPQuestionKey(${q.id}, this.value)" value="${q.correctAnswer.replace(/"/g, '&quot;')}" placeholder="e.g. Newton or exact concept matching terms" class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold focus:outline-none focus:border-brand-500 flex-1">
+            `}
+          </div>
+        `;
+        workspace.appendChild(div);
+      });
+
+      document.getElementById('cpWorkspaceContainer').classList.remove('hidden');
+    }
+
+    function updateCPQuestionType(id, type) {
+      const q = parsedCopyPasteQuestions.find(item => item.id === id);
+      if (q) {
+        q.type = type;
+        if (type !== 'mcq') {
+          q.options = [];
+        }
+        renderCopyPasteWorkspace();
+      }
+    }
+
+    function updateCPQuestionText(id, val) {
+      const q = parsedCopyPasteQuestions.find(item => item.id === id);
+      if (q) q.question = val;
+    }
+
+    function updateCPQuestionOption(id, optIdx, val) {
+      const q = parsedCopyPasteQuestions.find(item => item.id === id);
+      if (q && q.options) q.options[optIdx] = val;
+    }
+
+    function updateCPQuestionKey(id, val) {
+      const q = parsedCopyPasteQuestions.find(item => item.id === id);
+      if (q) q.correctAnswer = val;
+      if (q.type === 'mcq') {
+        renderCopyPasteWorkspace();
+      }
+    }
+
+    function deleteCPQuestion(id) {
+      parsedCopyPasteQuestions = parsedCopyPasteQuestions.filter(item => item.id !== id);
+      renderCopyPasteWorkspace();
+    }
+
     // Helper to generate sample test file
     function downloadSampleJSON() {
       const sample = {
@@ -1246,6 +1519,16 @@
           options: q.options.map((o, oIdx) => o || `Choice Option ${['A', 'B', 'C', 'D'][oIdx]}`),
           correctAnswer: q.correctAnswer
         }));
+      }
+      else if (activeTab === 'copypaste') {
+        if (!parsedCopyPasteQuestions || parsedCopyPasteQuestions.length === 0) {
+          alert("Please paste and parse a traditional exam paper first!");
+          return;
+        }
+        finalTitle = document.getElementById('cpTitle').value.trim() || "Copy-Pasted Mock Exam";
+        finalCategory = "Copy-Paste Exam";
+        testMode = 'json';
+        finalQuestions = parsedCopyPasteQuestions;
       }
 
       const hours = parseInt(document.getElementById('customHours').value) || 0;
@@ -1456,31 +1739,53 @@
           borderClass = "border-brand-500 dark:border-brand-500 ring-1 ring-brand-500";
         }
 
+        let rightSideHtml = '';
+        if (q.type === 'short' || q.type === 'long') {
+          const hasAns = !!currentSession.answers[qNum];
+          if (hasAns) {
+            rightSideHtml = `
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                <i class="fa-solid fa-file-signature"></i> Drafted
+              </span>
+            `;
+          } else {
+            rightSideHtml = `
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-400 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
+                <i class="fa-solid fa-keyboard"></i> Pending
+              </span>
+            `;
+          }
+        } else {
+          rightSideHtml = `
+            <div class="flex gap-1.5">
+              ${['A', 'B', 'C', 'D'].map(opt => {
+                const isActive = currentSession.answers[qNum] === opt;
+                const btnClass = isActive
+                  ? "h-8 w-8 rounded-full text-xs font-bold bg-brand-500 text-white border border-brand-600 shadow"
+                  : "h-8 w-8 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors";
+
+                return `
+                  <button onclick="markBubbleSelection(${qNum}, '${opt}')" class="${btnClass}">
+                    ${opt}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+
         div.className = `flex items-center justify-between p-3 rounded-xl bg-white/50 dark:bg-slate-800/40 border ${borderClass} shadow-sm transition-all`;
         div.innerHTML = `
           <button onclick="jumpToQuestion(${idx})" class="text-xs font-bold text-slate-500 dark:text-slate-400 hover:underline">
             Question ${qNum}
           </button>
-          <div class="flex gap-1.5">
-            ${['A', 'B', 'C', 'D'].map(opt => {
-              const isActive = currentSession.answers[qNum] === opt;
-              const btnClass = isActive
-                ? "h-8 w-8 rounded-full text-xs font-bold bg-brand-500 text-white border border-brand-600 shadow"
-                : "h-8 w-8 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors";
-
-              return `
-                <button onclick="markBubbleSelection(${qNum}, '${opt}')" class="${btnClass}">
-                  ${opt}
-                </button>
-              `;
-            }).join('')}
-          </div>
+          ${rightSideHtml}
         `;
         container.appendChild(div);
       });
 
       const answeredCount = Object.keys(currentSession.answers).filter(k => currentSession.answers[k]).length;
-      document.getElementById('digitalSheetStatus').textContent = `${answeredCount} of ${currentSession.questions.length} Bubble Answers Saved`;
+      document.getElementById('digitalSheetStatus').textContent = `${answeredCount} of ${currentSession.questions.length} Saved`;
     }
 
     function showActiveQuestion() {
@@ -1495,35 +1800,79 @@
       document.getElementById('totalQNumberDisplay').textContent = currentSession.questions.length;
       document.getElementById('questionTextDisplay').textContent = q.question;
 
+      const badgeEl = document.getElementById('questionRomanTitleBadge');
+      if (badgeEl) {
+        if (q.romanTitle) {
+          badgeEl.textContent = q.romanTitle;
+          badgeEl.classList.remove('hidden');
+          badgeEl.classList.add('inline-block');
+        } else {
+          badgeEl.classList.add('hidden');
+          badgeEl.classList.remove('inline-block');
+        }
+      }
+
       document.getElementById('prevQBtn').disabled = (currentSession.currentQIndex === 0);
       document.getElementById('nextQBtn').textContent = (currentSession.currentQIndex === currentSession.questions.length - 1) ? "Finalize" : "Next";
 
       const optionsContainer = document.getElementById('optionsContainer');
       optionsContainer.innerHTML = '';
 
-      q.options.forEach((optText, optIdx) => {
-        const optLetter = ['A', 'B', 'C', 'D'][optIdx];
-        const isSelected = currentSession.answers[qNum] === optLetter;
+      if (q.type === 'short' || q.type === 'long') {
+        const userVal = currentSession.answers[qNum] || '';
+        const fieldId = q.type === 'short' ? 'shortAnswerField' : 'longAnswerField';
+        const wrapper = document.createElement('div');
+        wrapper.className = "w-full flex flex-col gap-2";
 
-        const btn = document.createElement('button');
-        btn.onclick = () => selectOption(optLetter);
-
-        let styleClass = "option-btn w-full p-4 rounded-xl text-left font-semibold text-sm border flex items-center gap-4 transition-all ";
-        if (isSelected) {
-          styleClass += "bg-brand-500/10 border-brand-500 text-brand-600 dark:text-brand-300 shadow-sm";
+        if (q.type === 'short') {
+          wrapper.innerHTML = `
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Your Response (Short Answer)</label>
+            <input type="text" id="${fieldId}" value="${userVal.replace(/"/g, '&quot;')}" placeholder="Type your answer here..." class="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:border-brand-500 font-medium">
+          `;
         } else {
-          styleClass += "bg-white/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800";
+          wrapper.innerHTML = `
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Your Essay / Response (Long Answer)</label>
+            <textarea id="${fieldId}" rows="6" placeholder="Type your comprehensive essay or details here..." class="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:border-brand-500 leading-relaxed font-medium">${userVal}</textarea>
+          `;
         }
+        optionsContainer.appendChild(wrapper);
 
-        btn.className = styleClass;
-        btn.innerHTML = `
-          <span class="h-6 w-6 rounded-lg flex items-center justify-center text-xs font-bold ${isSelected ? 'bg-brand-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}">
-            ${optLetter}
-          </span>
-          <span class="flex-1">${optText}</span>
-        `;
-        optionsContainer.appendChild(btn);
-      });
+        const inputEl = document.getElementById(fieldId);
+        inputEl.addEventListener('input', (e) => {
+          const val = e.target.value;
+          if (val.trim() === '') {
+            delete currentSession.answers[qNum];
+          } else {
+            currentSession.answers[qNum] = val;
+          }
+          renderQuestionPalette();
+          renderDigitalOMRResponseSheet();
+        });
+      } else {
+        q.options.forEach((optText, optIdx) => {
+          const optLetter = ['A', 'B', 'C', 'D'][optIdx];
+          const isSelected = currentSession.answers[qNum] === optLetter;
+
+          const btn = document.createElement('button');
+          btn.onclick = () => selectOption(optLetter);
+
+          let styleClass = "option-btn w-full p-4 rounded-xl text-left font-semibold text-sm border flex items-center gap-4 transition-all ";
+          if (isSelected) {
+            styleClass += "bg-brand-500/10 border-brand-500 text-brand-600 dark:text-brand-300 shadow-sm";
+          } else {
+            styleClass += "bg-white/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800";
+          }
+
+          btn.className = styleClass;
+          btn.innerHTML = `
+            <span class="h-6 w-6 rounded-lg flex items-center justify-center text-xs font-bold ${isSelected ? 'bg-brand-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500'}">
+              ${optLetter}
+            </span>
+            <span class="flex-1">${optText}</span>
+          `;
+          optionsContainer.appendChild(btn);
+        });
+      }
 
       const reviewBtn = document.getElementById('markReviewBtn');
       if (currentSession.review[qNum]) {
@@ -1705,11 +2054,16 @@
 
         // Initialize evaluation mapping on first run if not present
         if (currentSession.evaluation[qNum] === undefined) {
-          currentSession.evaluation[qNum] = (userChoice !== '' && isConceptSame(userChoice, q.correctAnswer));
+          if (q.type === 'long') {
+            // Long answers require manual self-grading review
+            currentSession.evaluation[qNum] = false;
+          } else {
+            currentSession.evaluation[qNum] = (userChoice !== '' && isConceptSame(userChoice, q.correctAnswer));
+          }
         }
 
         const isCorrect = currentSession.evaluation[qNum];
-        const isFuzzyConceptMatch = isCorrect && (userChoice !== q.correctAnswer);
+        const isFuzzyConceptMatch = isCorrect && (q.type !== 'mcq') && (userChoice.trim().toLowerCase() !== String(q.correctAnswer).trim().toLowerCase());
 
         if (!userChoice) {
           unansweredCount++;
@@ -1727,43 +2081,89 @@
           (userChoice === '' ? "bg-amber-50/10 border-amber-500/20" :
            isCorrect ? "bg-emerald-50/10 border-emerald-500/20" : "bg-red-50/10 border-red-500/20");
 
-        // Options list review markup
-        const optionsListHtml = q.options.map((optText, optIdx) => {
-          const optLetter = ['A', 'B', 'C', 'D'][optIdx];
-          let optClass = "text-slate-600 dark:text-slate-400";
-          let badgeHtml = '';
+        // Dynamic body display based on type
+        let questionBodyHtml = '';
+        if (q.type === 'short' || q.type === 'long') {
+          const formattedUserAns = userChoice ? userChoice.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "<i>No response typed.</i>";
+          const formattedCorrectAns = q.correctAnswer ? q.correctAnswer.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "<i>None specified. Refer to explanation.</i>";
 
-          if (q.correctAnswer && optLetter === q.correctAnswer) {
-            optClass = "text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5";
-            badgeHtml = `<span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-bold">Correct Key</span>`;
-          } else if (optLetter === userChoice) {
-            optClass = "text-red-500 font-bold flex items-center gap-1.5";
-            badgeHtml = `<span class="px-2 py-0.5 rounded bg-red-500/10 text-red-500 text-[10px] font-bold">Your Response</span>`;
-          }
-
-          return `
-            <li class="flex items-center justify-between text-xs p-2 rounded bg-slate-100/50 dark:bg-slate-900/50">
-              <span class="${optClass}">Option ${optLetter}: ${optText}</span>
-              ${badgeHtml}
-            </li>
+          questionBodyHtml = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
+              <div class="p-4 rounded-xl bg-slate-100/40 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
+                <span class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1">
+                  <i class="fa-solid fa-user-pen"></i> Your Written Response
+                </span>
+                <p class="text-xs font-semibold text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed">${formattedUserAns}</p>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-100/40 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
+                <span class="block text-[10px] font-extrabold uppercase tracking-wider text-emerald-500 mb-1.5 flex items-center gap-1">
+                  <i class="fa-solid fa-key"></i> Model Answer / Keywords Key
+                </span>
+                <p class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 whitespace-pre-line leading-relaxed">${formattedCorrectAns}</p>
+              </div>
+            </div>
           `;
-        }).join('');
+        } else {
+          // Options list review markup for MCQs
+          const optionsListHtml = q.options.map((optText, optIdx) => {
+            const optLetter = ['A', 'B', 'C', 'D'][optIdx];
+            let optClass = "text-slate-600 dark:text-slate-400";
+            let badgeHtml = '';
+
+            if (q.correctAnswer && optLetter === q.correctAnswer) {
+              optClass = "text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5";
+              badgeHtml = `<span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-bold">Correct Key</span>`;
+            } else if (optLetter === userChoice) {
+              optClass = "text-red-500 font-bold flex items-center gap-1.5";
+              badgeHtml = `<span class="px-2 py-0.5 rounded bg-red-500/10 text-red-500 text-[10px] font-bold">Your Response</span>`;
+            }
+
+            return `
+              <li class="flex items-center justify-between text-xs p-2 rounded bg-slate-100/50 dark:bg-slate-900/50">
+                <span class="${optClass}">Option ${optLetter}: ${optText}</span>
+                ${badgeHtml}
+              </li>
+            `;
+          }).join('');
+
+          questionBodyHtml = `
+            <ul class="flex flex-col gap-1.5 mt-1">
+              ${optionsListHtml}
+            </ul>
+          `;
+        }
+
+        let gradeStatusBadge = '';
+        if (userChoice === '') {
+          gradeStatusBadge = '<i class="fa-solid fa-circle-minus"></i> Unanswered';
+        } else if (isCorrect) {
+          gradeStatusBadge = `<i class="fa-solid fa-circle-check"></i> Correct (+${positiveMark})`;
+          if (isFuzzyConceptMatch) {
+            gradeStatusBadge += ' <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 text-[10px] font-bold">Concept Match</span>';
+          }
+        } else {
+          if (q.type === 'long') {
+            gradeStatusBadge = '<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Review Needed';
+          } else {
+            gradeStatusBadge = `<i class="fa-solid fa-circle-xmark"></i> Incorrect (${negativeMark})`;
+          }
+        }
+
+        // Show roman title banner in scorecard if available
+        const bannerHtml = q.romanTitle ? `<div class="text-[10px] font-extrabold text-indigo-500 uppercase tracking-wide mb-1">${q.romanTitle}</div>` : '';
 
         card.innerHTML = `
           <div class="flex items-center justify-between">
             <span class="text-xs font-extrabold text-slate-400">QUESTION #${qNum}</span>
-            <span class="text-xs font-bold ${userChoice === '' ? 'text-amber-500' : isCorrect ? 'text-emerald-500' : 'text-red-500'} flex items-center gap-1.5">
-              ${userChoice === '' ? '<i class="fa-solid fa-circle-minus"></i> Unanswered' :
-                isCorrect ? `<i class="fa-solid fa-circle-check"></i> Correct (+${positiveMark}) ${isFuzzyConceptMatch ? '<span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 text-[10px] font-bold">Concept Match</span>' : ""}` :
-                `<i class="fa-solid fa-circle-xmark"></i> Incorrect (${negativeMark})`}
+            <span class="text-xs font-bold ${userChoice === '' ? 'text-amber-500' : isCorrect ? 'text-emerald-500' : (q.type === 'long' ? 'text-amber-500' : 'text-red-500')} flex items-center gap-1.5">
+              ${gradeStatusBadge}
             </span>
           </div>
 
+          ${bannerHtml}
           <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100 leading-relaxed">${q.question}</h4>
 
-          <ul class="flex flex-col gap-1.5 mt-1">
-            ${optionsListHtml}
-          </ul>
+          ${questionBodyHtml}
 
           ${q.explanation ? `
             <div class="mt-2 p-3 rounded-lg bg-slate-200/50 dark:bg-slate-900/60 border border-slate-300 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
