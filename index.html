@@ -1625,6 +1625,54 @@
       evaluateAndGradeTest();
     }
 
+    // Conceptual keyword similarity matching
+    function isConceptSame(userAns, correctAns) {
+      if (!userAns || !correctAns) return false;
+
+      const cleanU = String(userAns).trim().toLowerCase();
+      const cleanC = String(correctAns).trim().toLowerCase();
+
+      // If they are exactly equal or both are single-character option bubbles (e.g. A, B, C, D)
+      if (cleanU === cleanC) return true;
+
+      // If either are bubble answer keys (A, B, C, D), they must be exact matches
+      const isBubblePattern = /^[a-d]$/i;
+      if (isBubblePattern.test(cleanU) || isBubblePattern.test(cleanC)) {
+        return cleanU === cleanC;
+      }
+
+      // Conceptual matching for free-text or numeric answers:
+      // Strip common punctuation, stop words, extra spaces, and perform a keyword overlap match.
+      const stopWords = new Set(['the', 'is', 'a', 'an', 'and', 'or', 'of', 'in', 'on', 'to', 'for', 'with', 'at', 'by', 'from', 'unit', 'was', 'were', 'it', 'has', 'have']);
+
+      const tokenize = (str) => {
+        return str
+          .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, ' ') // remove punctuation
+          .split(/\s+/)                                   // split by space
+          .map(w => w.trim())
+          .filter(w => w.length > 0 && !stopWords.has(w));
+      };
+
+      const tokensU = new Set(tokenize(cleanU));
+      const tokensC = new Set(tokenize(cleanC));
+
+      if (tokensU.size === 0 || tokensC.size === 0) {
+        return cleanU === cleanC;
+      }
+
+      // Calculate intersection and union size
+      let intersectionSize = 0;
+      tokensU.forEach(token => {
+        if (tokensC.has(token)) {
+          intersectionSize++;
+        }
+      });
+
+      // If at least 65% of correct answer key terms are present, consider it conceptually matched!
+      const correctKeywordMatchRatio = intersectionSize / tokensC.size;
+      return (correctKeywordMatchRatio >= 0.65);
+    }
+
     function overrideGrading(qNum, isCorrectState) {
       if (!currentSession.evaluation) {
         currentSession.evaluation = {};
@@ -1657,10 +1705,11 @@
 
         // Initialize evaluation mapping on first run if not present
         if (currentSession.evaluation[qNum] === undefined) {
-          currentSession.evaluation[qNum] = (userChoice !== '' && userChoice === q.correctAnswer);
+          currentSession.evaluation[qNum] = (userChoice !== '' && isConceptSame(userChoice, q.correctAnswer));
         }
 
         const isCorrect = currentSession.evaluation[qNum];
+        const isFuzzyConceptMatch = isCorrect && (userChoice !== q.correctAnswer);
 
         if (!userChoice) {
           unansweredCount++;
@@ -1703,9 +1752,9 @@
         card.innerHTML = `
           <div class="flex items-center justify-between">
             <span class="text-xs font-extrabold text-slate-400">QUESTION #${qNum}</span>
-            <span class="text-xs font-bold ${userChoice === '' ? 'text-amber-500' : isCorrect ? 'text-emerald-500' : 'text-red-500'}">
+            <span class="text-xs font-bold ${userChoice === '' ? 'text-amber-500' : isCorrect ? 'text-emerald-500' : 'text-red-500'} flex items-center gap-1.5">
               ${userChoice === '' ? '<i class="fa-solid fa-circle-minus"></i> Unanswered' :
-                isCorrect ? `<i class="fa-solid fa-circle-check"></i> Correct (+${positiveMark})` :
+                isCorrect ? `<i class="fa-solid fa-circle-check"></i> Correct (+${positiveMark}) ${isFuzzyConceptMatch ? '<span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 text-[10px] font-bold">Concept Match</span>' : ""}` :
                 `<i class="fa-solid fa-circle-xmark"></i> Incorrect (${negativeMark})`}
             </span>
           </div>
