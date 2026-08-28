@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>J.A.R.V.I.S. // Stark Industries AI Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Overlay Scanlines & Hex Grid -->
+  <div class="hud-overlay"></div>
+  <div class="hud-scanline"></div>
+
+  <!-- Main Container -->
+  <div class="jarvis-container">
+
+    <!-- HEADER BAR -->
+    <header class="hud-header">
+      <div class="header-left">
+        <div class="stark-logo">
+          <span class="stark-text">STARK</span>
+          <span class="sub-text">INDUSTRIES</span>
+        </div>
+        <div class="header-badge">J.A.R.V.I.S. v10.8</div>
+        <div class="suit-badge" id="suit-badge">MARK LXXXV // NANO-TECH</div>
+      </div>
+
+      <div class="header-center">
+        <div class="hud-title">SYSTEM PROTOCOL ACTIVE</div>
+        <div class="sys-status" id="sys-status-indicator">
+          <span class="status-dot pulsing"></span>
+          <span id="sys-status-text">ALL SYSTEMS OPERATIONAL</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="user-profile">
+          <span class="profile-label">OPERATOR:</span>
+          <span class="user-name" id="user-display-name">Sir (Tony Stark)</span>
+          <button class="btn-icon" id="btn-edit-user" title="Change User Name">⚙️</button>
+        </div>
+        <div class="time-display">
+          <div id="clock-time">00:00:00</div>
+          <div id="clock-date">2025-01-01</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN DASHBOARD LAYOUT -->
+    <main class="hud-dashboard">
+
+      <!-- LEFT PANEL: ARC REACTOR & SUIT DIAGNOSTICS -->
+      <section class="hud-panel panel-left">
+        <div class="panel-header">
+          <h2><span class="icon">⚛️</span> ARC REACTOR CORE</h2>
+          <span class="panel-tag">POWER-PLANT</span>
+        </div>
+
+        <!-- ARC Reactor Canvas -->
+        <div class="arc-container">
+          <canvas id="arcReactorCanvas" width="260" height="260"></canvas>
+          <div class="arc-overlay-info">
+            <span class="arc-val" id="arc-power-pct">100%</span>
+            <span class="arc-lbl">OUTPUT</span>
+          </div>
+        </div>
+
+        <!-- Telemetry Data -->
+        <div class="telemetry-grid">
+          <div class="telemetry-box">
+            <span class="t-label">CORE TEMP</span>
+            <span class="t-value" id="t-core-temp">38.4 °C</span>
+          </div>
+          <div class="telemetry-box">
+            <span class="t-label">ENERGY OUTPUT</span>
+            <span class="t-value" id="t-energy-out">10.2 GJ/s</span>
+          </div>
+          <div class="telemetry-box">
+            <span class="t-label">VIBRANIUM MATRIX</span>
+            <span class="t-value color-cyan">STABLE</span>
+          </div>
+          <div class="telemetry-box">
+            <span class="t-label">VOLTAGE</span>
+            <span class="t-value" id="t-voltage">1.21 GW</span>
+          </div>
+        </div>
+
+        <!-- Armor Integrity Meters -->
+        <div class="panel-header margin-top">
+          <h2><span class="icon">🛡️</span> ARMOR INTEGRITY</h2>
+          <span class="panel-tag">MARK LXXXV</span>
+        </div>
+
+        <div class="integrity-list">
+          <div class="meter-group">
+            <div class="meter-label">
+              <span>HELMET / HUD</span>
+              <span id="pct-helmet">100%</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill" id="fill-helmet" style="width: 100%;"></div></div>
+          </div>
+
+          <div class="meter-group">
+            <div class="meter-label">
+              <span>CHEST & ARC HOUSING</span>
+              <span id="pct-chest">100%</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill" id="fill-chest" style="width: 100%;"></div></div>
+          </div>
+
+          <div class="meter-group">
+            <div class="meter-label">
+              <span>REPULSOR GAUNTLETS</span>
+              <span id="pct-repulsors">100%</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill" id="fill-repulsors" style="width: 100%;"></div></div>
+          </div>
+
+          <div class="meter-group">
+            <div class="meter-label">
+              <span>FLIGHT THRUSTERS</span>
+              <span id="pct-thrusters">100%</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill" id="fill-thrusters" style="width: 100%;"></div></div>
+          </div>
+
+          <div class="meter-group">
+            <div class="meter-label">
+              <span>NANO-REPAIR RESERVE</span>
+              <span id="pct-nanotech">98%</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill cyan" id="fill-nanotech" style="width: 98%;"></div></div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- CENTER PANEL: CONSOLE, CHAT & COMMAND CENTER -->
+      <section class="hud-panel panel-center">
+
+        <div class="center-top-bar">
+          <div class="jarvis-avatar">
+            <div class="avatar-ring ring-1"></div>
+            <div class="avatar-ring ring-2"></div>
+            <div class="avatar-core">AI</div>
+          </div>
+          <div class="avatar-info">
+            <div class="ai-title">J.A.R.V.I.S.</div>
+            <div class="ai-subtitle">Just A Rather Very Intelligent System</div>
+          </div>
+          <div class="voice-controls">
+            <button class="btn-hud" id="btn-toggle-voice">
+              <span id="voice-icon">🔊</span> <span id="voice-label">VOICE: ON</span>
+            </button>
+            <button class="btn-hud btn-mic" id="btn-toggle-mic">
+              <span id="mic-icon">🎙️</span> <span id="mic-label">LISTEN</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Audio Visualizer Waveform Canvas -->
+        <div class="audio-viz-wrapper">
+          <canvas id="audioVizCanvas" width="500" height="40"></canvas>
+        </div>
+
+        <!-- Terminal Chat Output -->
+        <div class="terminal-chat-window" id="chat-window">
+          <!-- Messages will be dynamically rendered here -->
+        </div>
+
+        <!-- Quick Action Protocols Bar -->
+        <div class="quick-actions-bar">
+          <button class="btn-action" data-cmd="Run full diagnostic">⚡ DIAGNOSTICS</button>
+          <button class="btn-action" data-cmd="House Party Protocol">🚀 HOUSE PARTY</button>
+          <button class="btn-action" data-cmd="Fire Repulsors">💥 REPULSORS</button>
+          <button class="btn-action" data-cmd="Stark Tower power status">🏙️ TOWER POWER</button>
+          <button class="btn-action" data-cmd="Weather report">🌤️ WEATHER</button>
+          <button class="btn-action" data-cmd="Help">❓ CAPABILITIES</button>
+        </div>
+
+        <!-- Input Box & Command Form -->
+        <form class="command-input-form" id="command-form">
+          <div class="input-wrapper">
+            <span class="prompt-symbol">&gt;_</span>
+            <input type="text" id="command-input" placeholder="Speak or type a command for JARVIS, Sir..." autocomplete="off">
+            <button type="submit" class="btn-send">EXECUTE</button>
+          </div>
+        </form>
+
+      </section>
+
+
+      <!-- RIGHT PANEL: TACTICAL RADAR, SMART ASSISTANT & PROTOCOLS -->
+      <section class="hud-panel panel-right">
+
+        <!-- Tactical Radar display -->
+        <div class="panel-header">
+          <h2><span class="icon">🎯</span> TACTICAL RADAR</h2>
+          <span class="panel-tag" id="radar-targets-count">3 TARGETS</span>
+        </div>
+
+        <div class="radar-container">
+          <canvas id="tacticalRadarCanvas" width="240" height="240"></canvas>
+          <div class="radar-status-overlay" id="radar-status-text">SWEEPING AIRSPACE...</div>
+        </div>
+
+        <!-- Smart Protocols Hub -->
+        <div class="panel-header margin-top">
+          <h2><span class="icon">🛰️</span> DEFENSE & AUTOMATION</h2>
+          <span class="panel-tag">PROTOCOLS</span>
+        </div>
+
+        <div class="protocol-grid">
+          <div class="protocol-card" id="proto-sentry" data-protocol="Sentry Mode">
+            <div class="p-title">SENTRY MODE</div>
+            <div class="p-status" id="p-sentry-status">OFFLINE</div>
+          </div>
+          <div class="protocol-card" id="proto-stealth" data-protocol="Stealth Camouflage">
+            <div class="p-title">STEALTH CAMO</div>
+            <div class="p-status" id="p-stealth-status">INACTIVE</div>
+          </div>
+          <div class="protocol-card" id="proto-veronica" data-protocol="Veronica Link">
+            <div class="p-title">VERONICA LINK</div>
+            <div class="p-status text-gold" id="p-veronica-status">ORBIT READY</div>
+          </div>
+          <div class="protocol-card" id="proto-cleanslate" data-protocol="Clean Slate">
+            <div class="p-title">CLEAN SLATE</div>
+            <div class="p-status text-alert" id="p-clean-status">ARMED</div>
+          </div>
+        </div>
+
+        <!-- Task & Memo Manager -->
+        <div class="panel-header margin-top">
+          <h2><span class="icon">📝</span> STARK MEMOS & TASKS</h2>
+          <button class="btn-sm" id="btn-add-task">+ ADD TASK</button>
+        </div>
+
+        <div class="task-list" id="task-list">
+          <!-- Rendered via JS -->
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- FOOTER STATUS STRIP -->
+    <footer class="hud-footer">
+      <div class="footer-left">
+        <span class="f-item">ENCRYPTION: <span>QUANTUM AES-512</span></span>
+        <span class="f-item">NETWORK: <span>STARK-SATELLITE-LINK-7</span></span>
+      </div>
+      <div class="footer-center">
+        <span>"I am Iron Man." — Anthony Edward Stark</span>
+      </div>
+      <div class="footer-right">
+        <span class="f-item">AUDIO SYNTH: <span>WEB-SPEECH-API</span></span>
+        <span class="f-item">SYS-FPS: <span id="sys-fps">60 FPS</span></span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- EDIT USER NAME MODAL -->
+  <div class="modal-backdrop" id="user-modal" hidden>
+    <div class="modal-box">
+      <h3>PERSONALIZATION</h3>
+      <p>How should J.A.R.V.I.S. address you, Sir?</p>
+      <input type="text" id="input-user-name" placeholder="e.g. Tony, Sir, Mr. Stark">
+      <div class="modal-buttons">
+        <button class="btn-hud" id="btn-save-user">SAVE PREFERENCE</button>
+        <button class="btn-hud btn-secondary" id="btn-cancel-user">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
