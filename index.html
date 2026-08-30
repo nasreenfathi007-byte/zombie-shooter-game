@@ -221,7 +221,7 @@ body {
 /* MAIN DASHBOARD GRID */
 .hud-dashboard {
   display: grid;
-  grid-template-columns: 280px 1fr 280px;
+  grid-template-columns: 280px 1fr 310px;
   gap: 12px;
   flex: 1;
   min-height: 0;
@@ -637,7 +637,7 @@ body {
   padding: 5px 10px;
   border-radius: 4px;
   font-family: var(--font-hud);
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.2s;
@@ -710,8 +710,8 @@ body {
 /* TACTICAL RADAR */
 .radar-container {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 180px;
+  height: 180px;
   margin: 4px auto;
   display: flex;
   justify-content: center;
@@ -719,8 +719,8 @@ body {
 }
 
 #tacticalRadarCanvas {
-  width: 200px;
-  height: 200px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
   border: 1px solid var(--cyan-main);
   box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
@@ -743,6 +743,18 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom Scrollbar for Protocol Grid */
+.protocol-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.protocol-grid::-webkit-scrollbar-thumb {
+  background: rgba(0, 243, 255, 0.3);
+  border-radius: 2px;
 }
 
 .protocol-card {
@@ -752,6 +764,9 @@ body {
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .protocol-card:hover {
@@ -764,10 +779,23 @@ body {
   border-color: var(--green-ok);
 }
 
+.protocol-card.alert-active {
+  background: rgba(255, 42, 85, 0.2);
+  border-color: var(--red-alert);
+}
+
+.p-movie {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: var(--gold-accent);
+  letter-spacing: 0.5px;
+}
+
 .p-title {
   font-family: var(--font-hud);
   font-size: 0.6rem;
   color: var(--text-main);
+  margin: 2px 0;
 }
 
 .p-status {
@@ -780,6 +808,10 @@ body {
 
 .protocol-card.active .p-status {
   color: var(--green-ok);
+}
+
+.protocol-card.alert-active .p-status {
+  color: var(--red-alert);
 }
 
 /* TASK MANAGER LIST */
@@ -922,15 +954,15 @@ body {
           <span class="stark-text">STARK</span>
           <span class="sub-text">INDUSTRIES</span>
         </div>
-        <div class="header-badge">J.A.R.V.I.S. v10.8</div>
+        <div class="header-badge">J.A.R.V.I.S. MCU MASTER PROTOCOL</div>
         <div class="suit-badge" id="suit-badge">MARK LXXXV // NANO-TECH</div>
       </div>
 
       <div class="header-center">
-        <div class="hud-title">SYSTEM PROTOCOL ACTIVE</div>
+        <div class="hud-title">MCU TACTICAL HUB</div>
         <div class="sys-status" id="sys-status-indicator">
           <span class="status-dot pulsing"></span>
-          <span id="sys-status-text">ALL SYSTEMS OPERATIONAL</span>
+          <span id="sys-status-text">14 PROTOCOLS LOADED</span>
         </div>
       </div>
 
@@ -962,7 +994,7 @@ body {
           <canvas id="arcReactorCanvas" width="260" height="260"></canvas>
           <div class="arc-overlay-info">
             <span class="arc-val" id="arc-power-pct">100%</span>
-            <span class="arc-lbl">OUTPUT</span>
+            <span class="arc-lbl" id="arc-power-lbl">OUTPUT</span>
           </div>
         </div>
 
@@ -978,7 +1010,7 @@ body {
           </div>
           <div class="telemetry-box">
             <span class="t-label">VIBRANIUM MATRIX</span>
-            <span class="t-value color-cyan">STABLE</span>
+            <span class="t-value color-cyan" id="t-matrix">STABLE</span>
           </div>
           <div class="telemetry-box">
             <span class="t-label">VOLTAGE</span>
@@ -1072,12 +1104,15 @@ body {
 
         <!-- Quick Action Protocols Bar -->
         <div class="quick-actions-bar">
-          <button class="btn-action" data-cmd="Run full diagnostic">⚡ DIAGNOSTICS</button>
           <button class="btn-action" data-cmd="House Party Protocol">🚀 HOUSE PARTY</button>
-          <button class="btn-action" data-cmd="Fire Repulsors">💥 REPULSORS</button>
-          <button class="btn-action" data-cmd="Stark Tower power status">🏙️ TOWER POWER</button>
-          <button class="btn-action" data-cmd="Weather report">🌤️ WEATHER</button>
-          <button class="btn-action" data-cmd="Help">❓ CAPABILITIES</button>
+          <button class="btn-action" data-cmd="EDITH Drone Mesh">🕶️ EDITH MESH</button>
+          <button class="btn-action" data-cmd="Veronica Link">🛰️ VERONICA</button>
+          <button class="btn-action" data-cmd="Instant Kill Protocol">☠️ INSTANT KILL</button>
+          <button class="btn-action" data-cmd="Thor Lightning Charge">⚡ THOR CHARGE</button>
+          <button class="btn-action" data-cmd="Quantum Time Heist">⏳ TIME HEIST</button>
+          <button class="btn-action" data-cmd="Nano Repair Protocol">🛠️ NANO REPAIR</button>
+          <button class="btn-action" data-cmd="Stealth Camouflage">👻 STEALTH CAMO</button>
+          <button class="btn-action" data-cmd="Help">❓ MCU PROTOCOLS</button>
         </div>
 
         <!-- Input Box & Command Form -->
@@ -1102,33 +1137,18 @@ body {
         </div>
 
         <div class="radar-container">
-          <canvas id="tacticalRadarCanvas" width="240" height="240"></canvas>
+          <canvas id="tacticalRadarCanvas" width="180" height="180"></canvas>
           <div class="radar-status-overlay" id="radar-status-text">SWEEPING AIRSPACE...</div>
         </div>
 
-        <!-- Smart Protocols Hub -->
+        <!-- MCU Smart Protocols Hub -->
         <div class="panel-header margin-top">
-          <h2><span class="icon">🛰️</span> DEFENSE & AUTOMATION</h2>
-          <span class="panel-tag">PROTOCOLS</span>
+          <h2><span class="icon">🛰️</span> MCU DEFENSE PROTOCOLS</h2>
+          <span class="panel-tag">MCU DATABASE</span>
         </div>
 
-        <div class="protocol-grid">
-          <div class="protocol-card" id="proto-sentry" data-protocol="Sentry Mode">
-            <div class="p-title">SENTRY MODE</div>
-            <div class="p-status" id="p-sentry-status">OFFLINE</div>
-          </div>
-          <div class="protocol-card" id="proto-stealth" data-protocol="Stealth Camouflage">
-            <div class="p-title">STEALTH CAMO</div>
-            <div class="p-status" id="p-stealth-status">INACTIVE</div>
-          </div>
-          <div class="protocol-card" id="proto-veronica" data-protocol="Veronica Link">
-            <div class="p-title">VERONICA LINK</div>
-            <div class="p-status text-gold" id="p-veronica-status">ORBIT READY</div>
-          </div>
-          <div class="protocol-card" id="proto-cleanslate" data-protocol="Clean Slate">
-            <div class="p-title">CLEAN SLATE</div>
-            <div class="p-status text-alert" id="p-clean-status">ARMED</div>
-          </div>
+        <div class="protocol-grid" id="mcu-protocol-grid">
+          <!-- Dynamically populated MCU Protocols -->
         </div>
 
         <!-- Task & Memo Manager -->
@@ -1182,6 +1202,124 @@ body {
 
 document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
+  // MCU PROTOCOLS DEFINITION DATABASE
+  // --------------------------------------------------------------------------
+  const MCU_PROTOCOLS = [
+    {
+      id: 'houseparty',
+      name: 'HOUSE PARTY',
+      movie: 'IRON MAN 3',
+      description: 'Deploys Iron Legion Marks VIII-XLI subterranean suit array.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'cleanslate',
+      name: 'CLEAN SLATE',
+      movie: 'IRON MAN 3',
+      description: 'Triggers synchronized self-destruction sequence for all active suits.',
+      active: false,
+      alertStyle: true
+    },
+    {
+      id: 'veronica',
+      name: 'VERONICA LINK',
+      movie: 'AVENGERS: AGE OF ULTRON',
+      description: 'Deploys orbital satellite module & Mark XLIV Hulkbuster cage.',
+      active: true,
+      alertStyle: false
+    },
+    {
+      id: 'edith',
+      name: 'E.D.I.T.H. DRONE MESH',
+      movie: 'SPIDER-MAN: FAR FROM HOME',
+      description: 'Even Dead I\'m The Hero orbital drone tactical strike network.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'instantkill',
+      name: 'INSTANT KILL',
+      movie: 'SPIDER-MAN: HOMECOMING',
+      description: 'Engages high-lethal auto-targeting pin-point gauntlet lethality.',
+      active: false,
+      alertStyle: true
+    },
+    {
+      id: 'trainingwheels',
+      name: 'TRAINING WHEELS',
+      movie: 'SPIDER-MAN: HOMECOMING',
+      description: 'Safety limiter override enabling full uninhibited suit capabilities.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'sentry',
+      name: 'SENTRY MODE',
+      movie: 'AGE OF ULTRON / CIVIL WAR',
+      description: 'Autonomous sentry mode securing perimeter and operator area.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'stealth',
+      name: 'STEALTH CAMOUFLAGE',
+      movie: 'IRON MAN 3 / HOMECOMING',
+      description: 'Light-bending active optical cloak renders suit completely invisible.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'nanorepair',
+      name: 'NANO-REPAIR',
+      movie: 'AVENGERS: INFINITY WAR / ENDGAME',
+      description: 'Redirects nano-particle reserves to auto-reconstruct damaged plating.',
+      active: true,
+      alertStyle: false
+    },
+    {
+      id: 'lightningcharge',
+      name: 'THOR LIGHTNING CHARGE',
+      movie: 'THE AVENGERS / ENDGAME',
+      description: 'Channel external high-voltage electrical energy directly into Arc Core (475%).',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'timeheist',
+      name: 'QUANTUM TIME-HEIST GPS',
+      movie: 'AVENGERS: ENDGAME',
+      description: 'Calculates mobius strip chronal spatial quantum realm trajectory.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'babymonitor',
+      name: 'BABY MONITOR',
+      movie: 'SPIDER-MAN: HOMECOMING',
+      description: 'Streams and logs audio/video HUD feeds to Stark Cloud servers.',
+      active: true,
+      alertStyle: false
+    },
+    {
+      id: 'suborbital',
+      name: 'SUB-ORBITAL FLIGHT',
+      movie: 'IRON MAN',
+      description: 'Calibrates high-altitude thermal anti-icing for upper troposphere.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'emergencyeject',
+      name: 'EMERGENCY POD EJECT',
+      movie: 'AVENGERS: INFINITY WAR',
+      description: 'Deploys nano-encapsulated survival pod in catastrophic suit failure.',
+      active: false,
+      alertStyle: true
+    }
+  ];
+
+  // --------------------------------------------------------------------------
   // STATE MANAGEMENT & USER PREFERENCES
   // --------------------------------------------------------------------------
   const state = {
@@ -1192,12 +1330,7 @@ document.addEventListener('DOMContentLoaded', () => {
     coreTemp: 38.4,
     energyOutput: 10.2,
     voltage: 1.21,
-    protocols: {
-      sentry: false,
-      stealth: false,
-      veronica: true,
-      cleanslate: false
-    },
+    protocols: MCU_PROTOCOLS,
     tasks: JSON.parse(localStorage.getItem('jarvis_tasks')) || [
       { id: 1, text: "Calibrate Mark LXXXV nanotech repulsors", completed: true },
       { id: 2, text: "Review clean energy grid for Avengers Compound", completed: false },
@@ -1246,12 +1379,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const taskListEl = document.getElementById('task-list');
   const btnAddTask = document.getElementById('btn-add-task');
+  const mcuProtocolGrid = document.getElementById('mcu-protocol-grid');
 
   // Telemetry elements
   const elArcPowerPct = document.getElementById('arc-power-pct');
+  const elArcPowerLbl = document.getElementById('arc-power-lbl');
   const elCoreTemp = document.getElementById('t-core-temp');
   const elEnergyOut = document.getElementById('t-energy-out');
   const elVoltage = document.getElementById('t-voltage');
+  const elMatrix = document.getElementById('t-matrix');
 
   // --------------------------------------------------------------------------
   // CLOCK & TIMERS
@@ -1347,6 +1483,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
         osc.start(now);
         osc.stop(now + 0.3);
+      } else if (type === 'charge') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.exponentialRampToValueAtTime(2400, now + 0.8);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.8);
+        osc.start(now);
+        osc.stop(now + 0.8);
       }
     } catch (e) {
       console.warn("Audio error:", e);
@@ -1482,10 +1626,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     arcCtx.clearRect(0, 0, width, height);
 
+    // Dynamic rotation speed based on power output
+    const speedMult = state.arcPowerPct / 100;
+
     // Outer Glowing Ring
     arcCtx.beginPath();
     arcCtx.arc(cx, cy, 115, 0, Math.PI * 2);
-    arcCtx.strokeStyle = 'rgba(0, 243, 255, 0.2)';
+    arcCtx.strokeStyle = state.arcPowerPct > 200 ? 'rgba(255, 183, 0, 0.4)' : 'rgba(0, 243, 255, 0.2)';
     arcCtx.lineWidth = 4;
     arcCtx.stroke();
 
@@ -1498,9 +1645,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const angle = (i * Math.PI * 2) / segments;
       arcCtx.beginPath();
       arcCtx.arc(0, 0, 100, angle, angle + 0.35);
-      arcCtx.strokeStyle = '#00f3ff';
+      arcCtx.strokeStyle = state.arcPowerPct > 200 ? '#ffb700' : '#00f3ff';
       arcCtx.lineWidth = 6;
-      arcCtx.shadowColor = '#00f3ff';
+      arcCtx.shadowColor = state.arcPowerPct > 200 ? '#ffb700' : '#00f3ff';
       arcCtx.shadowBlur = 12;
       arcCtx.stroke();
     }
@@ -1515,9 +1662,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const angle = (i * Math.PI * 2) / innerSegments;
       arcCtx.beginPath();
       arcCtx.arc(0, 0, 75, angle, angle + 0.5);
-      arcCtx.strokeStyle = '#0066ff';
+      arcCtx.strokeStyle = state.arcPowerPct > 200 ? '#ff2a55' : '#0066ff';
       arcCtx.lineWidth = 5;
-      arcCtx.shadowColor = '#0066ff';
+      arcCtx.shadowColor = state.arcPowerPct > 200 ? '#ff2a55' : '#0066ff';
       arcCtx.shadowBlur = 10;
       arcCtx.stroke();
     }
@@ -1525,17 +1672,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Core Glowing Circle
     const gradient = arcCtx.createRadialGradient(cx, cy, 10, cx, cy, 55);
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-    gradient.addColorStop(0.3, 'rgba(0, 243, 255, 0.8)');
-    gradient.addColorStop(0.7, 'rgba(0, 102, 255, 0.4)');
-    gradient.addColorStop(1, 'transparent');
+    if (state.arcPowerPct > 200) {
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      gradient.addColorStop(0.3, 'rgba(255, 183, 0, 0.9)');
+      gradient.addColorStop(0.7, 'rgba(255, 42, 85, 0.6)');
+      gradient.addColorStop(1, 'transparent');
+    } else {
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+      gradient.addColorStop(0.3, 'rgba(0, 243, 255, 0.8)');
+      gradient.addColorStop(0.7, 'rgba(0, 102, 255, 0.4)');
+      gradient.addColorStop(1, 'transparent');
+    }
 
     arcCtx.beginPath();
     arcCtx.arc(cx, cy, 55, 0, Math.PI * 2);
     arcCtx.fillStyle = gradient;
     arcCtx.fill();
 
-    arcRotation += 0.015;
+    arcRotation += 0.015 * Math.max(0.5, speedMult);
   }
 
   // Audio Waveform Visualizer
@@ -1578,7 +1732,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const h = radarCanvas.height;
     const cx = w / 2;
     const cy = h / 2;
-    const radius = w / 2 - 10;
+    const radius = w / 2 - 8;
 
     radarCtx.clearRect(0, 0, w, h);
 
@@ -1641,9 +1795,9 @@ document.addEventListener('DOMContentLoaded', () => {
       radarCtx.shadowBlur = 6;
       radarCtx.fill();
 
-      radarCtx.font = '8px "Share Tech Mono"';
+      radarCtx.font = '7px "Share Tech Mono"';
       radarCtx.fillStyle = '#d0f4ff';
-      radarCtx.fillText(target.label, tx + 6, ty + 3);
+      radarCtx.fillText(target.label, tx + 5, ty + 2);
     });
 
     state.radarAngle += 0.03;
@@ -1690,7 +1844,93 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // NATURAL LANGUAGE COMMAND PROCESSOR (JARVIS PERSONA)
+  // MCU PROTOCOLS RENDERING & TOGGLE HANDLERS
+  // --------------------------------------------------------------------------
+  function renderMcuProtocols() {
+    mcuProtocolGrid.innerHTML = '';
+    state.protocols.forEach(proto => {
+      const card = document.createElement('div');
+      card.className = `protocol-card ${proto.active ? (proto.alertStyle ? 'alert-active' : 'active') : ''}`;
+      card.setAttribute('data-id', proto.id);
+
+      const movieEl = document.createElement('div');
+      movieEl.className = 'p-movie';
+      movieEl.textContent = proto.movie;
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'p-title';
+      titleEl.textContent = proto.name;
+
+      const statusEl = document.createElement('div');
+      statusEl.className = 'p-status';
+      statusEl.textContent = proto.active ? (proto.alertStyle ? 'ARMED / ACTIVE' : 'ACTIVE / ONLINE') : 'OFFLINE';
+
+      card.appendChild(movieEl);
+      card.appendChild(titleEl);
+      card.appendChild(statusEl);
+
+      card.addEventListener('click', () => {
+        toggleProtocol(proto.id);
+      });
+
+      mcuProtocolGrid.appendChild(card);
+    });
+  }
+
+  function toggleProtocol(protoId) {
+    const proto = state.protocols.find(p => p.id === protoId);
+    if (!proto) return;
+
+    proto.active = !proto.active;
+    renderMcuProtocols();
+
+    if (proto.active) {
+      playSciFiSound(proto.alertStyle ? 'alert' : 'beep');
+      const msg = `Protocol ${proto.name} engaged, ${state.userName}. (${proto.movie}) - ${proto.description}`;
+      addJarvisMessage(msg);
+      speak(`${proto.name} engaged, ${state.userName}.`);
+
+      // Special HUD side effects for key protocols
+      if (proto.id === 'lightningcharge') {
+        state.arcPowerPct = 475;
+        state.energyOutput = 48.5;
+        state.voltage = 5.75;
+        elArcPowerPct.textContent = '475%';
+        elArcPowerLbl.textContent = 'OVERCHARGE';
+        elEnergyOut.textContent = '48.5 GJ/s';
+        elVoltage.textContent = '5.75 GW';
+        elMatrix.textContent = 'THOR CHARGE';
+        elMatrix.className = 't-value text-gold';
+        playSciFiSound('charge');
+      } else if (proto.id === 'edith') {
+        state.targets.push({ id: Date.now(), dist: 0.4, angle: 120, label: "EDITH DRONE 01", type: "friendly" });
+        state.targets.push({ id: Date.now()+1, dist: 0.7, angle: 210, label: "EDITH DRONE 02", type: "friendly" });
+        document.getElementById('radar-targets-count').textContent = `${state.targets.length} TARGETS`;
+      }
+    } else {
+      playSciFiSound('beep');
+      const msg = `Protocol ${proto.name} deactivated, ${state.userName}.`;
+      addJarvisMessage(msg);
+      speak(`${proto.name} deactivated.`);
+
+      if (proto.id === 'lightningcharge') {
+        state.arcPowerPct = 100;
+        state.energyOutput = 10.2;
+        state.voltage = 1.21;
+        elArcPowerPct.textContent = '100%';
+        elArcPowerLbl.textContent = 'OUTPUT';
+        elEnergyOut.textContent = '10.2 GJ/s';
+        elVoltage.textContent = '1.21 GW';
+        elMatrix.textContent = 'STABLE';
+        elMatrix.className = 't-value color-cyan';
+      }
+    }
+  }
+
+  renderMcuProtocols();
+
+  // --------------------------------------------------------------------------
+  // NATURAL LANGUAGE COMMAND PROCESSOR (MCU JARVIS PERSONA)
   // --------------------------------------------------------------------------
   function handleCommandSubmit(rawInput) {
     const input = rawInput.trim();
@@ -1730,36 +1970,82 @@ document.addEventListener('DOMContentLoaded', () => {
       speak(resp);
       playSciFiSound('beep');
     }
-    // 2. House Party Protocol
+    // 2. House Party Protocol (Iron Man 3)
     else if (query.includes('house party') || query.includes('party protocol')) {
-      const resp = `House Party Protocol initiated, ${state.userName}. Deploying all Iron Man armor suits from subterranean vault: Mark I through Mark LXXXV. Airspace secured.`;
-      addJarvisMessage(resp);
-      speak(resp);
-      playSciFiSound('alert');
-      state.protocols.sentry = true;
-      document.getElementById('proto-sentry').classList.add('active');
-      document.getElementById('p-sentry-status').textContent = 'ONLINE (SENTRY)';
+      toggleProtocol('houseparty');
     }
-    // 3. Fire / Calibrate Repulsors
+    // 3. Clean Slate Protocol (Iron Man 3)
+    else if (query.includes('clean slate')) {
+      toggleProtocol('cleanslate');
+    }
+    // 4. Veronica Link / Hulkbuster (Avengers: Age of Ultron)
+    else if (query.includes('veronica') || query.includes('hulkbuster') || query.includes('barn dance')) {
+      toggleProtocol('veronica');
+    }
+    // 5. EDITH Drone Mesh (Spider-Man: Far From Home)
+    else if (query.includes('edith') || query.includes('drone')) {
+      toggleProtocol('edith');
+    }
+    // 6. Instant Kill Protocol (Spider-Man: Homecoming)
+    else if (query.includes('instant kill') || query.includes('lethal mode')) {
+      toggleProtocol('instantkill');
+    }
+    // 7. Training Wheels Protocol (Spider-Man: Homecoming)
+    else if (query.includes('training wheels') || query.includes('limiter')) {
+      toggleProtocol('trainingwheels');
+    }
+    // 8. Sentry Mode (Age of Ultron / Civil War)
+    else if (query.includes('sentry') || query.includes('perimeter')) {
+      toggleProtocol('sentry');
+    }
+    // 9. Stealth Camouflage (Iron Man 3 / Homecoming)
+    else if (query.includes('stealth') || query.includes('camo') || query.includes('cloak')) {
+      toggleProtocol('stealth');
+    }
+    // 10. Nano-Repair (Infinity War / Endgame)
+    else if (query.includes('nano repair') || query.includes('nanotech') || query.includes('repair protocol')) {
+      toggleProtocol('nanorepair');
+    }
+    // 11. Thor Lightning Charge (The Avengers / Endgame)
+    else if (query.includes('thor') || query.includes('lightning') || query.includes('charge') || query.includes('475')) {
+      toggleProtocol('lightningcharge');
+    }
+    // 12. Quantum Time-Heist GPS (Avengers: Endgame)
+    else if (query.includes('time heist') || query.includes('quantum') || query.includes('mobius')) {
+      toggleProtocol('timeheist');
+    }
+    // 13. Baby Monitor Protocol (Spider-Man: Homecoming)
+    else if (query.includes('baby monitor') || query.includes('log feed')) {
+      toggleProtocol('babymonitor');
+    }
+    // 14. Sub-Orbital Flight (Iron Man)
+    else if (query.includes('sub-orbital') || query.includes('high altitude') || query.includes('icing')) {
+      toggleProtocol('suborbital');
+    }
+    // 15. Emergency Ejection (Infinity War)
+    else if (query.includes('eject') || query.includes('emergency pod') || query.includes('escape capsule')) {
+      toggleProtocol('emergencyeject');
+    }
+    // 16. Fire / Calibrate Repulsors
     else if (query.includes('repulsor') || query.includes('fire') || query.includes('blast') || query.includes('shoot')) {
       const resp = `Repulsors charged and fired, ${state.userName}. Target neutralized with zero collateral damage. Beam intensity recalibrated to maximum output.`;
       addJarvisMessage(resp);
       speak(resp);
       playSciFiSound('repulsor');
     }
-    // 4. Stark Tower Power
+    // 17. Stark Tower Power
     else if (query.includes('tower') || query.includes('stark tower') || query.includes('power')) {
-      const resp = `Stark Tower clean arc energy grid is operating at peak efficiency, ${state.userName}. Main pent-house suite power draw is normal. Cybernetic security protocols engaged.`;
+      const resp = `Stark Tower clean arc energy grid is operating at peak efficiency, ${state.userName}. Main penthouse suite power draw is normal. Cybernetic security protocols engaged.`;
       addJarvisMessage(resp);
       speak(resp);
     }
-    // 5. Weather
+    // 18. Weather
     else if (query.includes('weather') || query.includes('forecast') || query.includes('climate')) {
       const resp = `Current local conditions: 22°C with clear skies, wind speeds at 8 knots from the West. Optimal conditions for high-altitude repulsor flight tests, ${state.userName}.`;
       addJarvisMessage(resp);
       speak(resp);
     }
-    // 6. Greetings / Persona Banter
+    // 19. Greetings / Persona Banter
     else if (query.includes('hello') || query.includes('hi') || query.includes('hey') || query.includes('jarvis')) {
       const resp = `Always a pleasure to assist you, ${state.userName}. How may I be of service today?`;
       addJarvisMessage(resp);
@@ -1775,7 +2061,7 @@ document.addEventListener('DOMContentLoaded', () => {
       addJarvisMessage(resp);
       speak(resp);
     }
-    // 7. Tasks / Memos Command
+    // 20. Tasks / Memos Command
     else if (query.includes('add task') || query.includes('remind me') || query.includes('memo')) {
       const taskText = cmd.replace(/add task|remind me to|memo/gi, '').trim();
       if (taskText) {
@@ -1789,22 +2075,23 @@ document.addEventListener('DOMContentLoaded', () => {
         speak(resp);
       }
     }
-    // 8. Help / Capabilities
-    else if (query.includes('help') || query.includes('capabilities') || query.includes('what can you do')) {
-      const resp = `I can execute suit diagnostics, trigger House Party or Veronica protocols, fire repulsor bursts, monitor tactical radar targets, track Stark memos, and assist with daily tasks, ${state.userName}. Speak or type commands anytime.`;
+    // 21. Help / MCU Protocols List
+    else if (query.includes('help') || query.includes('capabilities') || query.includes('mcu protocols') || query.includes('what can you do')) {
+      const protoNames = state.protocols.map(p => p.name).join(', ');
+      const resp = `I have loaded 14 MCU Iron Man Protocols: ${protoNames}. You can trigger any protocol by typing its name, clicking the protocol cards on the right panel, or using voice commands, ${state.userName}.`;
       addJarvisMessage(resp);
       speak(resp);
     }
     // Default fallback intelligence
     else {
-      const resp = `Analyzing query: "${cmd}". Database search complete, ${state.userName}. Protocols ready at your instruction.`;
+      const resp = `Analyzing query: "${cmd}". MCU database search complete, ${state.userName}. All 14 Iron Man protocols standing by.`;
       addJarvisMessage(resp);
       speak(resp);
     }
   }
 
   // --------------------------------------------------------------------------
-  // TASKS & PROTOCOL INTERACTIONS
+  // TASKS & MEMO INTERACTIONS
   // --------------------------------------------------------------------------
   function renderTasks() {
     taskListEl.innerHTML = '';
@@ -1862,32 +2149,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderTasks();
 
-  // Interactive Defense Protocol cards
-  document.querySelectorAll('.protocol-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const protoName = card.getAttribute('data-protocol');
-      const statusEl = card.querySelector('.p-status');
-      const isCurrentlyActive = card.classList.contains('active');
-
-      if (isCurrentlyActive) {
-        card.classList.remove('active');
-        statusEl.textContent = 'INACTIVE';
-        playSciFiSound('beep');
-        addJarvisMessage(`${protoName} deactivated, ${state.userName}.`);
-        speak(`${protoName} deactivated.`);
-      } else {
-        card.classList.add('active');
-        statusEl.textContent = 'ACTIVE / ONLINE';
-        playSciFiSound('alert');
-        addJarvisMessage(`${protoName} engaged successfully, ${state.userName}. All defense parameters locked.`);
-        speak(`${protoName} engaged, ${state.userName}.`);
-      }
-    });
-  });
-
   // INITIAL JARVIS WELCOME GREETING
   setTimeout(() => {
-    const welcome = `Welcome back, ${state.userName}. All Mark LXXXV systems operational. Arc Reactor output is at 100%. How may I assist you today?`;
+    const welcome = `Welcome back, ${state.userName}. MCU Master Database loaded with 14 active Iron Man protocols. Arc Reactor output is at 100%. How may I assist you today?`;
     addJarvisMessage(welcome);
     speak(welcome);
   }, 600);
