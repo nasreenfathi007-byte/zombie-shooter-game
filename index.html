@@ -1,0 +1,2336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>J.A.R.V.I.S. // Stark Industries AI Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+/* ==========================================================================
+   J.A.R.V.I.S. // STARK INDUSTRIES HUD STYLES
+   ========================================================================== */
+
+:root {
+  --bg-dark: #030a16;
+  --bg-panel: rgba(6, 20, 42, 0.65);
+  --bg-panel-border: rgba(0, 243, 255, 0.3);
+  --cyan-main: #00f3ff;
+  --cyan-glow: rgba(0, 243, 255, 0.5);
+  --blue-accent: #0066ff;
+  --gold-accent: #ffb700;
+  --red-alert: #ff2a55;
+  --green-ok: #00ff88;
+  --text-main: #d0f4ff;
+  --text-dim: #5a8aa8;
+  --font-hud: 'Orbitron', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(0, 150, 255, 0.1) 0%, transparent 70%),
+    linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 30px 30px, 30px 30px;
+}
+
+/* Background overlay scanline & grid */
+.hud-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 40%, rgba(2, 8, 18, 0.8) 100%);
+  z-index: 10;
+}
+
+.hud-scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 4px;
+  background: rgba(0, 243, 255, 0.15);
+  box-shadow: 0 0 15px var(--cyan-main);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 11;
+  animation: scanlineAnim 8s linear infinite;
+}
+
+@keyframes scanlineAnim {
+  0% { transform: translateY(-10px); }
+  100% { transform: translateY(100vh); }
+}
+
+/* Container */
+.jarvis-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 12px;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+/* HEADER */
+.hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-panel);
+  border: 1px solid var(--bg-panel-border);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.15), inset 0 0 10px rgba(0, 243, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-family: var(--font-hud);
+}
+
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stark-logo {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.stark-text {
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--cyan-main);
+  text-shadow: 0 0 8px var(--cyan-glow);
+}
+
+.sub-text {
+  font-size: 0.5rem;
+  letter-spacing: 2px;
+  color: var(--gold-accent);
+}
+
+.header-badge, .suit-badge, .ml-badge {
+  font-size: 0.7rem;
+  background: rgba(0, 243, 255, 0.1);
+  border: 1px solid var(--cyan-main);
+  color: var(--cyan-main);
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+}
+
+.ml-badge {
+  border-color: var(--green-ok);
+  color: var(--green-ok);
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.suit-badge {
+  border-color: var(--gold-accent);
+  color: var(--gold-accent);
+  background: rgba(255, 183, 0, 0.1);
+}
+
+.hud-title {
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.sys-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--green-ok);
+  letter-spacing: 1.5px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--green-ok);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--green-ok);
+}
+
+.status-dot.pulsing {
+  animation: pulseDot 1.5s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.4; }
+}
+
+.user-profile {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-label {
+  color: var(--text-dim);
+}
+
+.user-name {
+  color: var(--cyan-main);
+  font-weight: 700;
+}
+
+.time-display {
+  font-family: var(--font-mono);
+  text-align: right;
+  line-height: 1.1;
+}
+
+#clock-time {
+  font-size: 1.1rem;
+  color: var(--cyan-main);
+  text-shadow: 0 0 6px var(--cyan-glow);
+}
+
+#clock-date {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+/* MAIN DASHBOARD GRID */
+.hud-dashboard {
+  display: grid;
+  grid-template-columns: 280px 1fr 310px;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* PANELS */
+.hud-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--bg-panel-border);
+  box-shadow: 0 0 20px rgba(0, 100, 200, 0.15), inset 0 0 15px rgba(0, 243, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 6px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Glassmorphic border glow line on top */
+.hud-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan-main), transparent);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.panel-header.margin-top {
+  margin-top: 16px;
+}
+
+.panel-header h2 {
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  color: var(--cyan-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.panel-tag {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2px 5px;
+  border-radius: 2px;
+}
+
+/* ARC REACTOR CANVAS CONTAINER */
+.arc-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 6px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#arcReactorCanvas {
+  width: 200px;
+  height: 200px;
+}
+
+.arc-overlay-info {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.arc-val {
+  font-family: var(--font-hud);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--cyan-main);
+  text-shadow: 0 0 10px var(--cyan-glow);
+}
+
+.arc-lbl {
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+}
+
+/* TELEMETRY GRID */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.telemetry-box {
+  background: rgba(0, 243, 255, 0.05);
+  border: 1px solid rgba(0, 243, 255, 0.15);
+  padding: 6px 8px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.t-label {
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.t-value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.color-cyan { color: var(--cyan-main); }
+.text-gold { color: var(--gold-accent); }
+.text-alert { color: var(--red-alert); }
+
+/* METER BARS */
+.integrity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meter-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.meter-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+.meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue-accent), var(--cyan-main));
+  box-shadow: 0 0 8px var(--cyan-glow);
+  transition: width 0.5s ease-in-out;
+}
+
+.meter-fill.cyan {
+  background: linear-gradient(90deg, var(--cyan-main), var(--green-ok));
+}
+
+/* CENTER PANEL (JARVIS CONSOLE) */
+.panel-center {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.center-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+.jarvis-avatar {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+
+.avatar-ring.ring-1 {
+  width: 44px;
+  height: 44px;
+  border-top-color: var(--cyan-main);
+  border-bottom-color: var(--cyan-main);
+  animation: spin 3s linear infinite;
+}
+
+.avatar-ring.ring-2 {
+  width: 34px;
+  height: 34px;
+  border-left-color: var(--gold-accent);
+  border-right-color: var(--gold-accent);
+  animation: spinReverse 2s linear infinite;
+}
+
+.avatar-core {
+  font-family: var(--font-hud);
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--cyan-main);
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes spinReverse { 100% { transform: rotate(-360deg); } }
+
+.avatar-info {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.ai-title {
+  font-family: var(--font-hud);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--cyan-main);
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px var(--cyan-glow);
+}
+
+.ai-subtitle {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.voice-controls {
+  display: flex;
+  gap: 8px;
+}
+
+/* BUTTONS */
+.btn-hud {
+  background: rgba(0, 243, 255, 0.1);
+  border: 1px solid var(--cyan-main);
+  color: var(--cyan-main);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-family: var(--font-hud);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-hud:hover {
+  background: var(--cyan-main);
+  color: #000;
+  box-shadow: 0 0 12px var(--cyan-glow);
+}
+
+.btn-hud.btn-mic.listening {
+  background: rgba(255, 42, 85, 0.2);
+  border-color: var(--red-alert);
+  color: var(--red-alert);
+  animation: pulseMic 1s infinite alternate;
+}
+
+@keyframes pulseMic {
+  from { box-shadow: 0 0 5px var(--red-alert); }
+  to { box-shadow: 0 0 15px var(--red-alert); }
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.btn-icon:hover { opacity: 1; }
+
+.btn-sm {
+  background: rgba(0, 243, 255, 0.1);
+  border: 1px solid rgba(0, 243, 255, 0.3);
+  color: var(--cyan-main);
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.btn-sm:hover { background: rgba(0, 243, 255, 0.25); }
+
+/* AUDIO VIZ WAVEFORM */
+.audio-viz-wrapper {
+  margin: 10px 0;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed rgba(0, 243, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#audioVizCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* CHAT TERMINAL WINDOW */
+.terminal-chat-window {
+  flex: 1;
+  background: rgba(2, 10, 24, 0.7);
+  border: 1px solid rgba(0, 243, 255, 0.2);
+  border-radius: 6px;
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: var(--font-mono);
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+}
+
+/* Chat Message Bubbles */
+.chat-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+  animation: fadeInMsg 0.25s ease-out;
+}
+
+@keyframes fadeInMsg {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-msg.jarvis {
+  align-self: flex-start;
+}
+
+.chat-msg.user {
+  align-self: flex-end;
+}
+
+.msg-header {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  margin-bottom: 2px;
+  display: flex;
+  gap: 8px;
+}
+
+.chat-msg.user .msg-header {
+  justify-content: flex-end;
+}
+
+.msg-bubble {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.chat-msg.jarvis .msg-bubble {
+  background: rgba(0, 102, 255, 0.15);
+  border: 1px solid rgba(0, 243, 255, 0.4);
+  color: #e0f7ff;
+  border-top-left-radius: 0;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.05);
+}
+
+.chat-msg.user .msg-bubble {
+  background: rgba(255, 183, 0, 0.15);
+  border: 1px solid rgba(255, 183, 0, 0.4);
+  color: #fff6d6;
+  border-top-right-radius: 0;
+}
+
+/* QUICK ACTION PROTOCOLS BAR */
+.quick-actions-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 10px 0 6px 0;
+}
+
+.btn-action {
+  background: rgba(0, 243, 255, 0.08);
+  border: 1px solid rgba(0, 243, 255, 0.3);
+  color: var(--cyan-main);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-family: var(--font-hud);
+  font-size: 0.58rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1 1 calc(33.33% - 6px);
+  text-align: center;
+}
+
+.btn-action:hover {
+  background: rgba(0, 243, 255, 0.25);
+  border-color: var(--cyan-main);
+  box-shadow: 0 0 8px var(--cyan-glow);
+}
+
+/* COMMAND FORM INPUT */
+.command-input-form {
+  margin-top: 4px;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 20, 45, 0.9);
+  border: 1px solid var(--cyan-main);
+  box-shadow: 0 0 12px rgba(0, 243, 255, 0.2);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.prompt-symbol {
+  font-family: var(--font-mono);
+  color: var(--cyan-main);
+  font-weight: 700;
+  padding: 0 6px;
+}
+
+#command-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  padding: 8px 4px;
+}
+
+#command-input::placeholder {
+  color: rgba(90, 138, 168, 0.7);
+}
+
+.btn-send {
+  background: var(--cyan-main);
+  border: none;
+  color: #000;
+  font-family: var(--font-hud);
+  font-weight: 800;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-send:hover {
+  background: #fff;
+  box-shadow: 0 0 12px var(--cyan-main);
+}
+
+/* TACTICAL RADAR */
+.radar-container {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 4px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#tacticalRadarCanvas {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 1px solid var(--cyan-main);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+}
+
+.radar-status-overlay {
+  position: absolute;
+  bottom: -6px;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--cyan-main);
+  letter-spacing: 1px;
+  background: rgba(0, 10, 25, 0.8);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+/* PROTOCOL CARDS */
+.protocol-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Custom Scrollbar for Protocol Grid */
+.protocol-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.protocol-grid::-webkit-scrollbar-thumb {
+  background: rgba(0, 243, 255, 0.3);
+  border-radius: 2px;
+}
+
+.protocol-card {
+  background: rgba(0, 243, 255, 0.05);
+  border: 1px solid rgba(0, 243, 255, 0.2);
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.protocol-card:hover {
+  background: rgba(0, 243, 255, 0.15);
+  border-color: var(--cyan-main);
+}
+
+.protocol-card.active {
+  background: rgba(0, 255, 136, 0.15);
+  border-color: var(--green-ok);
+}
+
+.protocol-card.alert-active {
+  background: rgba(255, 42, 85, 0.2);
+  border-color: var(--red-alert);
+}
+
+.p-movie {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: var(--gold-accent);
+  letter-spacing: 0.5px;
+}
+
+.p-title {
+  font-family: var(--font-hud);
+  font-size: 0.6rem;
+  color: var(--text-main);
+  margin: 2px 0;
+}
+
+.p-status {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.protocol-card.active .p-status {
+  color: var(--green-ok);
+}
+
+.protocol-card.alert-active .p-status {
+  color: var(--red-alert);
+}
+
+/* TASK MANAGER LIST */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(0, 243, 255, 0.2);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.task-item.completed span {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.btn-del-task {
+  background: transparent;
+  border: none;
+  color: var(--red-alert);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+/* FOOTER */
+.hud-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-panel);
+  border: 1px solid var(--bg-panel-border);
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.f-item span {
+  color: var(--cyan-main);
+}
+
+/* MODAL */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 5, 15, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal-backdrop[hidden] {
+  display: none !important;
+}
+
+.modal-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--cyan-main);
+  box-shadow: 0 0 25px var(--cyan-glow);
+  padding: 24px;
+  border-radius: 8px;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+}
+
+.modal-box h3 {
+  font-family: var(--font-hud);
+  color: var(--cyan-main);
+  letter-spacing: 2px;
+}
+
+.modal-box input {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--cyan-main);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  outline: none;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-secondary {
+  border-color: var(--text-dim);
+  color: var(--text-dim);
+}
+.btn-secondary:hover {
+  background: var(--text-dim);
+  color: #000;
+}
+
+/* RESPONSIVE BREAKPOINTS */
+@media (max-width: 900px) {
+  .hud-dashboard {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  body {
+    overflow-y: auto;
+  }
+}
+  </style>
+</head>
+<body>
+  <!-- Overlay Scanlines & Hex Grid -->
+  <div class="hud-overlay"></div>
+  <div class="hud-scanline"></div>
+
+  <!-- Main Container -->
+  <div class="jarvis-container">
+
+    <!-- HEADER BAR -->
+    <header class="hud-header">
+      <div class="header-left">
+        <div class="stark-logo">
+          <span class="stark-text">STARK</span>
+          <span class="sub-text">INDUSTRIES</span>
+        </div>
+        <div class="header-badge">J.A.R.V.I.S. MCU MASTER PROTOCOL</div>
+        <div class="ml-badge" id="ml-status-badge">NEURAL ML ENGINE: ONLINE</div>
+        <div class="suit-badge" id="suit-badge">MARK LXXXV // NANO-TECH</div>
+      </div>
+
+      <div class="header-center">
+        <div class="hud-title">MCU TACTICAL HUB</div>
+        <div class="sys-status" id="sys-status-indicator">
+          <span class="status-dot pulsing"></span>
+          <span id="sys-status-text">15 PROTOCOLS + ML NLP ONLINE</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="user-profile">
+          <span class="profile-label">OPERATOR:</span>
+          <span class="user-name" id="user-display-name">Sir (Tony Stark)</span>
+          <button class="btn-icon" id="btn-edit-user" title="Change User Name">⚙️</button>
+        </div>
+        <div class="time-display">
+          <div id="clock-time">00:00:00</div>
+          <div id="clock-date">2025-01-01</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN DASHBOARD LAYOUT -->
+    <main class="hud-dashboard">
+
+      <!-- LEFT PANEL: ARC REACTOR & SUIT DIAGNOSTICS -->
+      <section class="hud-panel panel-left">
+        <div class="panel-header">
+          <h2><span class="icon">⚛️</span> ARC REACTOR CORE</h2>
+          <span class="panel-tag">POWER-PLANT</span>
+        </div>
+
+        <!-- ARC Reactor Canvas -->
+        <div class="arc-container">
+          <canvas id="arcReactorCanvas" width="260" height="260"></canvas>
+          <div class="arc-overlay-info">
+            <span class="arc-val" id="arc-power-pct">100%</span>
+            <span class="arc-lbl" id="arc-power-lbl">OUTPUT</span>
+          </div>
+        </div>
+
+        <!-- Telemetry Data -->
+        <div class="telemetry-grid">
+          <div class="telemetry-box">
+            <span class="t-label">CORE TEMP</span>
+            <span class="t-value" id="t-core-temp">38.4 °C</span>
+          </div>
+          <div class="telemetry-box">
+            <span class="t-label">ENERGY OUTPUT</span>
+            <span class="t-value" id="t-energy-out">10.2 GJ/s</span>
+          </div>
+          <div class="telemetry-box">
+            <span class="t-label">VIBRANIUM MATRIX</span>
+            <span class="t-value color-cyan" id="t-matrix">STABLE</span>
+          </div>
+          <div class="telemetry-box">
+            <span class="t-label">VOLTAGE</span>
+            <span class="t-value" id="t-voltage">1.21 GW</span>
+          </div>
+        </div>
+
+        <!-- Armor Integrity Meters -->
+        <div class="panel-header margin-top">
+          <h2><span class="icon">🛡️</span> ARMOR INTEGRITY</h2>
+          <span class="panel-tag">MARK LXXXV</span>
+        </div>
+
+        <div class="integrity-list">
+          <div class="meter-group">
+            <div class="meter-label">
+              <span>HELMET / HUD</span>
+              <span id="pct-helmet">100%</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill" id="fill-helmet" style="width: 100%;"></div></div>
+          </div>
+
+          <div class="meter-group">
+            <div class="meter-label">
+              <span>CHEST & ARC HOUSING</span>
+              <span id="pct-chest">100%</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill" id="fill-chest" style="width: 100%;"></div></div>
+          </div>
+
+          <div class="meter-group">
+            <div class="meter-label">
+              <span>REPULSOR GAUNTLETS</span>
+              <span id="pct-repulsors">100%</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill" id="fill-repulsors" style="width: 100%;"></div></div>
+          </div>
+
+          <div class="meter-group">
+            <div class="meter-label">
+              <span>FLIGHT THRUSTERS</span>
+              <span id="pct-thrusters">100%</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill" id="fill-thrusters" style="width: 100%;"></div></div>
+          </div>
+
+          <div class="meter-group">
+            <div class="meter-label">
+              <span>NANO-REPAIR RESERVE</span>
+              <span id="pct-nanotech">98%</span>
+            </div>
+            <div class="meter-bar"><div class="meter-fill cyan" id="fill-nanotech" style="width: 98%;"></div></div>
+          </div>
+        </div>
+
+      </section>
+
+
+      <!-- CENTER PANEL: CONSOLE, CHAT & COMMAND CENTER -->
+      <section class="hud-panel panel-center">
+
+        <div class="center-top-bar">
+          <div class="jarvis-avatar">
+            <div class="avatar-ring ring-1"></div>
+            <div class="avatar-ring ring-2"></div>
+            <div class="avatar-core">AI</div>
+          </div>
+          <div class="avatar-info">
+            <div class="ai-title">J.A.R.V.I.S.</div>
+            <div class="ai-subtitle">Just A Rather Very Intelligent System</div>
+          </div>
+          <div class="voice-controls">
+            <button class="btn-hud" id="btn-toggle-voice">
+              <span id="voice-icon">🔊</span> <span id="voice-label">VOICE: ON</span>
+            </button>
+            <button class="btn-hud btn-mic" id="btn-toggle-mic">
+              <span id="mic-icon">🎙️</span> <span id="mic-label">LISTEN</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Audio Visualizer Waveform Canvas -->
+        <div class="audio-viz-wrapper">
+          <canvas id="audioVizCanvas" width="500" height="40"></canvas>
+        </div>
+
+        <!-- Terminal Chat Output -->
+        <div class="terminal-chat-window" id="chat-window">
+          <!-- Messages will be dynamically rendered here -->
+        </div>
+
+        <!-- Quick Action Protocols Bar -->
+        <div class="quick-actions-bar">
+          <button class="btn-action" data-cmd="Barn Door Protocol">🚪 BARN DOOR</button>
+          <button class="btn-action" data-cmd="House Party Protocol">🚀 HOUSE PARTY</button>
+          <button class="btn-action" data-cmd="EDITH Drone Mesh">🕶️ EDITH MESH</button>
+          <button class="btn-action" data-cmd="Veronica Link">🛰️ VERONICA</button>
+          <button class="btn-action" data-cmd="Instant Kill Protocol">☠️ INSTANT KILL</button>
+          <button class="btn-action" data-cmd="Thor Lightning Charge">⚡ THOR CHARGE</button>
+          <button class="btn-action" data-cmd="Quantum Time Heist">⏳ TIME HEIST</button>
+          <button class="btn-action" data-cmd="Nano Repair Protocol">🛠️ NANO REPAIR</button>
+          <button class="btn-action" data-cmd="Stealth Camouflage">👻 STEALTH CAMO</button>
+          <button class="btn-action" data-cmd="Calculate 1.21 GW to Megajoules">🧮 MATH & PHYSICS</button>
+          <button class="btn-action" data-cmd="Neural Memory Summary">🧠 NEURAL MEMORY</button>
+          <button class="btn-action" data-cmd="Help">❓ MCU PROTOCOLS</button>
+        </div>
+
+        <!-- Input Box & Command Form -->
+        <form class="command-input-form" id="command-form">
+          <div class="input-wrapper">
+            <span class="prompt-symbol">&gt;_</span>
+            <input type="text" id="command-input" placeholder="Speak or type a command for JARVIS, Sir..." autocomplete="off">
+            <button type="submit" class="btn-send">EXECUTE</button>
+          </div>
+        </form>
+
+      </section>
+
+
+      <!-- RIGHT PANEL: TACTICAL RADAR, SMART ASSISTANT & PROTOCOLS -->
+      <section class="hud-panel panel-right">
+
+        <!-- Tactical Radar display -->
+        <div class="panel-header">
+          <h2><span class="icon">🎯</span> TACTICAL RADAR</h2>
+          <span class="panel-tag" id="radar-targets-count">3 TARGETS</span>
+        </div>
+
+        <div class="radar-container">
+          <canvas id="tacticalRadarCanvas" width="180" height="180"></canvas>
+          <div class="radar-status-overlay" id="radar-status-text">SWEEPING AIRSPACE...</div>
+        </div>
+
+        <!-- Neural AI Telemetry Widget -->
+        <div class="panel-header margin-top">
+          <h2><span class="icon">🧠</span> NEURAL AI INTENT CLASSIFIER</h2>
+          <span class="panel-tag" id="ml-confidence-tag">CONF: 99.8%</span>
+        </div>
+
+        <div class="telemetry-grid" style="margin-top: 4px;">
+          <div class="telemetry-box" style="grid-column: span 2;">
+            <span class="t-label">DETECTED ML INTENT</span>
+            <span class="t-value color-cyan" id="ml-intent-display">READY // STANDBY</span>
+          </div>
+          <div class="telemetry-box">
+            <span class="t-label">QUERIES PROCESSED</span>
+            <span class="t-value" id="ml-query-count">0</span>
+          </div>
+          <div class="telemetry-box">
+            <span class="t-label">TOP USER PREFERENCE</span>
+            <span class="t-value text-gold" id="ml-top-pref">GENERAL</span>
+          </div>
+        </div>
+
+        <!-- MCU Smart Protocols Hub -->
+        <div class="panel-header margin-top">
+          <h2><span class="icon">🛰️</span> MCU DEFENSE PROTOCOLS</h2>
+          <span class="panel-tag">MCU DATABASE</span>
+        </div>
+
+        <div class="protocol-grid" id="mcu-protocol-grid">
+          <!-- Dynamically populated MCU Protocols -->
+        </div>
+
+        <!-- Task & Memo Manager -->
+        <div class="panel-header margin-top">
+          <h2><span class="icon">📝</span> STARK MEMOS & TASKS</h2>
+          <button class="btn-sm" id="btn-add-task">+ ADD TASK</button>
+        </div>
+
+        <div class="task-list" id="task-list">
+          <!-- Rendered via JS -->
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- FOOTER STATUS STRIP -->
+    <footer class="hud-footer">
+      <div class="footer-left">
+        <span class="f-item">ENCRYPTION: <span>QUANTUM AES-512</span></span>
+        <span class="f-item">NETWORK: <span>STARK-SATELLITE-LINK-7</span></span>
+      </div>
+      <div class="footer-center">
+        <span>"I am Iron Man." — Anthony Edward Stark</span>
+      </div>
+      <div class="footer-right">
+        <span class="f-item">AI MODEL: <span>NEURAL NAIVE-BAYES + TF-IDF</span></span>
+        <span class="f-item">SYS-FPS: <span id="sys-fps">60 FPS</span></span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- EDIT USER NAME MODAL -->
+  <div class="modal-backdrop" id="user-modal" hidden>
+    <div class="modal-box">
+      <h3>PERSONALIZATION</h3>
+      <p>How should J.A.R.V.I.S. address you, Sir?</p>
+      <input type="text" id="input-user-name" placeholder="e.g. Tony, Sir, Mr. Stark">
+      <div class="modal-buttons">
+        <button class="btn-hud" id="btn-save-user">SAVE PREFERENCE</button>
+        <button class="btn-hud btn-secondary" id="btn-cancel-user">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+/* ==========================================================================
+   J.A.R.V.I.S. // STARK INDUSTRIES AI AGENT SYSTEM SCRIPT
+   ========================================================================== */
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  // --------------------------------------------------------------------------
+  // MACHINE LEARNING NATURAL LANGUAGE PROCESSING ENGINE (Naive Bayes + TF-IDF)
+  // --------------------------------------------------------------------------
+  class NeuralMLClassifier {
+    constructor() {
+      // Training Dataset mapping Intents to sample training phrases
+      this.dataset = {
+        'protocol_barndoor': ['barn door', 'call everyone', 'call pepper', 'contact peter', 'call avengers', 'emergency broadcast', 'connect all contacts'],
+        'protocol_houseparty': ['house party', 'deploy suits', 'deploy all armor', 'iron legion', 'unseal subterranean vault'],
+        'protocol_cleanslate': ['clean slate', 'destroy all suits', 'self destruct', 'detonate armors'],
+        'protocol_veronica': ['veronica', 'hulkbuster', 'deploy cage', 'barn dance', 'orbital drop'],
+        'protocol_edith': ['edith', 'drone mesh', 'orbital strike drones', 'engage edith'],
+        'protocol_instantkill': ['instant kill', 'lethal mode', 'engage kill mode', 'target lock eliminate'],
+        'protocol_thorcharge': ['thor', 'lightning charge', 'overcharge 475', 'absorb lightning', 'high voltage'],
+        'protocol_timeheist': ['time heist', 'quantum realm', 'mobius strip', 'time travel gps', 'chronal calculation'],
+        'protocol_stealth': ['stealth', 'camo', 'cloak', 'invisible mode', 'optical active cloak'],
+        'protocol_nanorepair': ['nano repair', 'nanotech fix', 'repair plating', 'regenerate suit'],
+        'diagnostics': ['status', 'diagnostic', 'health check', 'suit telemetry', 'system integrity', 'how is the suit'],
+        'fire_repulsors': ['fire repulsors', 'blast target', 'shoot repulsor', 'repulsor gauntlets', 'discharge beam'],
+        'stark_tower': ['stark tower', 'penthouse power', 'clean energy grid', 'tower security'],
+        'weather_report': ['weather', 'temperature outside', 'flight conditions', 'wind speed', 'forecast'],
+        'math_calculation': ['calculate', 'compute', 'solve', 'convert', 'math', 'plus', 'times', 'divided by', 'gigawatts', 'megajoules'],
+        'neural_memory': ['memory', 'neural stats', 'history', 'learning summary', 'top preferences'],
+        'greetings': ['hello jarvis', 'hey jarvis', 'hi jarvis', 'good morning', 'good evening', 'who are you', 'who am i'],
+        'capabilities': ['help', 'what can you do', 'capabilities', 'show protocols', 'mcu protocols']
+      };
+
+      this.vocabulary = new Set();
+      this.classCounts = {};
+      this.wordCounts = {};
+      this.totalDocs = 0;
+
+      this.train();
+    }
+
+    tokenize(text) {
+      return text.toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length > 1);
+    }
+
+    train() {
+      for (const [intent, phrases] of Object.entries(this.dataset)) {
+        this.classCounts[intent] = phrases.length;
+        this.totalDocs += phrases.length;
+        this.wordCounts[intent] = {};
+
+        phrases.forEach(phrase => {
+          const tokens = this.tokenize(phrase);
+          tokens.forEach(token => {
+            this.vocabulary.add(token);
+            this.wordCounts[intent][token] = (this.wordCounts[intent][token] || 0) + 1;
+          });
+        });
+      }
+    }
+
+    classify(text) {
+      const tokens = this.tokenize(text);
+      if (tokens.length === 0) {
+        return { intent: 'unknown', confidence: 0.5 };
+      }
+
+      const scores = {};
+      const vocabSize = this.vocabulary.size;
+
+      for (const intent of Object.keys(this.dataset)) {
+        // Prior P(class)
+        let logProb = Math.log(this.classCounts[intent] / this.totalDocs);
+        const totalWordsInClass = Object.values(this.wordCounts[intent]).reduce((a, b) => a + b, 0);
+
+        tokens.forEach(token => {
+          const wordCount = this.wordCounts[intent][token] || 0;
+          // Laplace smoothing (+1)
+          const probWordGivenClass = (wordCount + 1) / (totalWordsInClass + vocabSize);
+          logProb += Math.log(probWordGivenClass);
+        });
+
+        scores[intent] = logProb;
+      }
+
+      // Convert log-scores to probabilities (Softmax normalization)
+      const maxLog = Math.max(...Object.values(scores));
+      let expSum = 0;
+      const probs = {};
+
+      for (const [intent, logScore] of Object.entries(scores)) {
+        const expVal = Math.exp(logScore - maxLog);
+        probs[intent] = expVal;
+        expSum += expVal;
+      }
+
+      let bestIntent = 'unknown';
+      let bestProb = 0;
+
+      for (const [intent, expVal] of Object.entries(probs)) {
+        const normalizedProb = expVal / expSum;
+        if (normalizedProb > bestProb) {
+          bestProb = normalizedProb;
+          bestIntent = intent;
+        }
+      }
+
+      return {
+        intent: bestIntent,
+        confidence: Math.min(0.999, Math.max(0.60, bestProb))
+      };
+    }
+  }
+
+  const neuralClassifier = new NeuralMLClassifier();
+
+  // --------------------------------------------------------------------------
+  // MCU PROTOCOLS DEFINITION DATABASE
+  // --------------------------------------------------------------------------
+  const MCU_PROTOCOLS = [
+    {
+      id: 'barndoor',
+      name: 'BARN DOOR PROTOCOL',
+      movie: 'AVENGERS: ENDGAME / MCU',
+      description: 'Emergency high-priority comms broadcast calling Peter Parker, Pepper Potts, and all Avengers & allies.',
+      active: false,
+      alertStyle: true
+    },
+    {
+      id: 'houseparty',
+      name: 'HOUSE PARTY',
+      movie: 'IRON MAN 3',
+      description: 'Deploys Iron Legion Marks VIII-XLI subterranean suit array.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'cleanslate',
+      name: 'CLEAN SLATE',
+      movie: 'IRON MAN 3',
+      description: 'Triggers synchronized self-destruction sequence for all active suits.',
+      active: false,
+      alertStyle: true
+    },
+    {
+      id: 'veronica',
+      name: 'VERONICA LINK',
+      movie: 'AVENGERS: AGE OF ULTRON',
+      description: 'Deploys orbital satellite module & Mark XLIV Hulkbuster cage.',
+      active: true,
+      alertStyle: false
+    },
+    {
+      id: 'edith',
+      name: 'E.D.I.T.H. DRONE MESH',
+      movie: 'SPIDER-MAN: FAR FROM HOME',
+      description: 'Even Dead I\'m The Hero orbital drone tactical strike network.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'instantkill',
+      name: 'INSTANT KILL',
+      movie: 'SPIDER-MAN: HOMECOMING',
+      description: 'Engages high-lethal auto-targeting pin-point gauntlet lethality.',
+      active: false,
+      alertStyle: true
+    },
+    {
+      id: 'trainingwheels',
+      name: 'TRAINING WHEELS',
+      movie: 'SPIDER-MAN: HOMECOMING',
+      description: 'Safety limiter override enabling full uninhibited suit capabilities.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'sentry',
+      name: 'SENTRY MODE',
+      movie: 'AGE OF ULTRON / CIVIL WAR',
+      description: 'Autonomous sentry mode securing perimeter and operator area.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'stealth',
+      name: 'STEALTH CAMOUFLAGE',
+      movie: 'IRON MAN 3 / HOMECOMING',
+      description: 'Light-bending active optical cloak renders suit completely invisible.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'nanorepair',
+      name: 'NANO-REPAIR',
+      movie: 'AVENGERS: INFINITY WAR / ENDGAME',
+      description: 'Redirects nano-particle reserves to auto-reconstruct damaged plating.',
+      active: true,
+      alertStyle: false
+    },
+    {
+      id: 'lightningcharge',
+      name: 'THOR LIGHTNING CHARGE',
+      movie: 'THE AVENGERS / ENDGAME',
+      description: 'Channel external high-voltage electrical energy directly into Arc Core (475%).',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'timeheist',
+      name: 'QUANTUM TIME-HEIST GPS',
+      movie: 'AVENGERS: ENDGAME',
+      description: 'Calculates mobius strip chronal spatial quantum realm trajectory.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'babymonitor',
+      name: 'BABY MONITOR',
+      movie: 'SPIDER-MAN: HOMECOMING',
+      description: 'Streams and logs audio/video HUD feeds to Stark Cloud servers.',
+      active: true,
+      alertStyle: false
+    },
+    {
+      id: 'suborbital',
+      name: 'SUB-ORBITAL FLIGHT',
+      movie: 'IRON MAN',
+      description: 'Calibrates high-altitude thermal anti-icing for upper troposphere.',
+      active: false,
+      alertStyle: false
+    },
+    {
+      id: 'emergencyeject',
+      name: 'EMERGENCY POD EJECT',
+      movie: 'AVENGERS: INFINITY WAR',
+      description: 'Deploys nano-encapsulated survival pod in catastrophic suit failure.',
+      active: false,
+      alertStyle: true
+    }
+  ];
+
+  // --------------------------------------------------------------------------
+  // STATE MANAGEMENT & NEURAL MEMORY STORAGE
+  // --------------------------------------------------------------------------
+  const state = {
+    userName: localStorage.getItem('jarvis_user_name') || 'Sir',
+    voiceEnabled: true,
+    isListening: false,
+    arcPowerPct: 100,
+    coreTemp: 38.4,
+    energyOutput: 10.2,
+    voltage: 1.21,
+    protocols: MCU_PROTOCOLS,
+    tasks: JSON.parse(localStorage.getItem('jarvis_tasks')) || [
+      { id: 1, text: "Calibrate Mark LXXXV nanotech repulsors", completed: true },
+      { id: 2, text: "Review clean energy grid for Avengers Compound", completed: false },
+      { id: 3, text: "Order extra shawarma for the team", completed: false }
+    ],
+    neuralMemory: JSON.parse(localStorage.getItem('jarvis_neural_memory')) || {
+      queryHistory: [],
+      intentCounts: {},
+      totalQueries: 0
+    },
+    radarAngle: 0,
+    targets: [
+      { id: 1, dist: 0.65, angle: 45, label: "SAT-LINK 4", type: "friendly" },
+      { id: 2, dist: 0.85, angle: 160, label: "UNKNOWN BOGEY", type: "hostile" },
+      { id: 3, dist: 0.35, angle: 280, label: "QUINJET 02", type: "friendly" }
+    ]
+  };
+
+  function updateNeuralMemory(query, intent, confidence) {
+    state.neuralMemory.totalQueries += 1;
+    state.neuralMemory.intentCounts[intent] = (state.neuralMemory.intentCounts[intent] || 0) + 1;
+    state.neuralMemory.queryHistory.push({ query, intent, time: new Date().toISOString() });
+
+    // Keep max 50 recent queries in memory
+    if (state.neuralMemory.queryHistory.length > 50) {
+      state.neuralMemory.queryHistory.shift();
+    }
+
+    localStorage.setItem('jarvis_neural_memory', JSON.stringify(state.neuralMemory));
+
+    // Update HUD Telemetry Widget
+    document.getElementById('ml-intent-display').textContent = intent.toUpperCase().replace('_', ' ');
+    document.getElementById('ml-confidence-tag').textContent = `CONF: ${(confidence * 100).toFixed(1)}%`;
+    document.getElementById('ml-query-count').textContent = state.neuralMemory.totalQueries;
+
+    // Find top preferred intent
+    let topIntent = 'GENERAL';
+    let maxCount = 0;
+    for (const [k, v] of Object.entries(state.neuralMemory.intentCounts)) {
+      if (v > maxCount) {
+        maxCount = v;
+        topIntent = k.replace('protocol_', '').toUpperCase();
+      }
+    }
+    document.getElementById('ml-top-pref').textContent = topIntent;
+  }
+
+  // --------------------------------------------------------------------------
+  // DOM ELEMENTS
+  // --------------------------------------------------------------------------
+  const userDisplayName = document.getElementById('user-display-name');
+  const btnEditUser = document.getElementById('btn-edit-user');
+  const userModal = document.getElementById('user-modal');
+  const inputUserName = document.getElementById('input-user-name');
+  const btnSaveUser = document.getElementById('btn-save-user');
+  const btnCancelUser = document.getElementById('btn-cancel-user');
+
+  const clockTime = document.getElementById('clock-time');
+  const clockDate = document.getElementById('clock-date');
+
+  const chatWindow = document.getElementById('chat-window');
+  const commandForm = document.getElementById('command-form');
+  const commandInput = document.getElementById('command-input');
+
+  const btnToggleVoice = document.getElementById('btn-toggle-voice');
+  const voiceLabel = document.getElementById('voice-label');
+  const voiceIcon = document.getElementById('voice-icon');
+
+  const btnToggleMic = document.getElementById('btn-toggle-mic');
+  const micLabel = document.getElementById('mic-label');
+
+  const arcCanvas = document.getElementById('arcReactorCanvas');
+  const arcCtx = arcCanvas.getContext('2d');
+
+  const audioVizCanvas = document.getElementById('audioVizCanvas');
+  const audioVizCtx = audioVizCanvas.getContext('2d');
+
+  const radarCanvas = document.getElementById('tacticalRadarCanvas');
+  const radarCtx = radarCanvas.getContext('2d');
+
+  const taskListEl = document.getElementById('task-list');
+  const btnAddTask = document.getElementById('btn-add-task');
+  const mcuProtocolGrid = document.getElementById('mcu-protocol-grid');
+
+  // Telemetry elements
+  const elArcPowerPct = document.getElementById('arc-power-pct');
+  const elArcPowerLbl = document.getElementById('arc-power-lbl');
+  const elCoreTemp = document.getElementById('t-core-temp');
+  const elEnergyOut = document.getElementById('t-energy-out');
+  const elVoltage = document.getElementById('t-voltage');
+  const elMatrix = document.getElementById('t-matrix');
+
+  // Initializing Neural ML HUD Telemetry on load
+  document.getElementById('ml-query-count').textContent = state.neuralMemory.totalQueries;
+
+  // --------------------------------------------------------------------------
+  // CLOCK & TIMERS
+  // --------------------------------------------------------------------------
+  function updateClock() {
+    const now = new Date();
+    clockTime.textContent = now.toTimeString().split(' ')[0];
+    clockDate.textContent = now.toISOString().split('T')[0];
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // --------------------------------------------------------------------------
+  // USER PERSONALIZATION
+  // --------------------------------------------------------------------------
+  function updateUserNameDisplay() {
+    userDisplayName.textContent = `${state.userName}`;
+  }
+  updateUserNameDisplay();
+
+  btnEditUser.addEventListener('click', () => {
+    inputUserName.value = state.userName;
+    userModal.hidden = false;
+  });
+
+  btnCancelUser.addEventListener('click', () => {
+    userModal.hidden = true;
+  });
+
+  btnSaveUser.addEventListener('click', () => {
+    const val = inputUserName.value.trim();
+    if (val) {
+      state.userName = val;
+      localStorage.setItem('jarvis_user_name', val);
+      updateUserNameDisplay();
+      speak(`User name preference updated to ${val}, Sir.`);
+      addJarvisMessage(`Very well, Sir. I shall address you as ${val} henceforth.`);
+    }
+    userModal.hidden = true;
+  });
+
+  // --------------------------------------------------------------------------
+  // WEB AUDIO & SYNTHESIZER SFX
+  // --------------------------------------------------------------------------
+  let audioCtx = null;
+
+  function initAudioContext() {
+    if (!audioCtx) {
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtxClass) {
+        audioCtx = new AudioCtxClass();
+      }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+
+  function playSciFiSound(type) {
+    initAudioContext();
+    if (!audioCtx) return;
+
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      const now = audioCtx.currentTime;
+
+      if (type === 'beep') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      } else if (type === 'repulsor') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.3);
+        osc.frequency.exponentialRampToValueAtTime(200, now + 0.6);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+        osc.start(now);
+        osc.stop(now + 0.6);
+      } else if (type === 'alert') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(880, now + 0.15);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'charge') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.exponentialRampToValueAtTime(2400, now + 0.8);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.8);
+        osc.start(now);
+        osc.stop(now + 0.8);
+      }
+    } catch (e) {
+      console.warn("Audio error:", e);
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // WEB SPEECH API (TEXT TO SPEECH & RECOGNITION)
+  // --------------------------------------------------------------------------
+  const synth = window.speechSynthesis;
+  let jarvisVoice = null;
+
+  function loadVoices() {
+    if (!synth) return;
+    const voices = synth.getVoices();
+    jarvisVoice = voices.find(v => v.lang.includes('en-GB') || v.name.includes('UK') || v.name.includes('British') || v.name.includes('Oliver') || v.name.includes('Daniel') || v.name.includes('Google UK English Male')) ||
+                  voices.find(v => v.lang.includes('en')) || voices[0];
+  }
+
+  if (synth) {
+    loadVoices();
+    if (synth.onvoiceschanged !== undefined) {
+      synth.onvoiceschanged = loadVoices;
+    }
+  }
+
+  function speak(text) {
+    if (!state.voiceEnabled || !synth) return;
+    synth.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    if (jarvisVoice) {
+      utterance.voice = jarvisVoice;
+    }
+    utterance.pitch = 0.95;
+    utterance.rate = 1.0;
+    utterance.volume = 1.0;
+
+    utterance.onstart = () => { isAudioVizActive = true; };
+    utterance.onend = () => { isAudioVizActive = false; };
+
+    synth.speak(utterance);
+  }
+
+  // Toggle Voice Output
+  btnToggleVoice.addEventListener('click', () => {
+    state.voiceEnabled = !state.voiceEnabled;
+    if (state.voiceEnabled) {
+      voiceLabel.textContent = 'VOICE: ON';
+      voiceIcon.textContent = '🔊';
+      speak("Voice synthesis online, Sir.");
+    } else {
+      voiceLabel.textContent = 'VOICE: OFF';
+      voiceIcon.textContent = '🔇';
+      if (synth) synth.cancel();
+    }
+  });
+
+  // Speech Recognition (Mic Input)
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      state.isListening = true;
+      btnToggleMic.classList.add('listening');
+      micLabel.textContent = 'LISTENING...';
+      playSciFiSound('beep');
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      commandInput.value = transcript;
+      handleCommandSubmit(transcript);
+    };
+
+    recognition.onerror = (event) => {
+      console.warn('Speech recognition error:', event.error);
+      stopListening();
+    };
+
+    recognition.onend = () => { stopListening(); };
+  }
+
+  function stopListening() {
+    state.isListening = false;
+    btnToggleMic.classList.remove('listening');
+    micLabel.textContent = 'LISTEN';
+  }
+
+  btnToggleMic.addEventListener('click', () => {
+    if (!recognition) {
+      addJarvisMessage("I apologize, Sir. Speech recognition is not supported in this browser environment. You may type commands directly into the terminal.");
+      return;
+    }
+
+    if (state.isListening) {
+      recognition.stop();
+      stopListening();
+    } else {
+      initAudioContext();
+      try {
+        recognition.start();
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+  });
+
+  // --------------------------------------------------------------------------
+  // CANVAS ANIMATIONS (ARC REACTOR, AUDIO VIZ, TACTICAL RADAR)
+  // --------------------------------------------------------------------------
+  let arcRotation = 0;
+  let isAudioVizActive = false;
+
+  function drawArcReactor() {
+    const width = arcCanvas.width;
+    const height = arcCanvas.height;
+    const cx = width / 2;
+    const cy = height / 2;
+
+    arcCtx.clearRect(0, 0, width, height);
+
+    const speedMult = state.arcPowerPct / 100;
+
+    arcCtx.beginPath();
+    arcCtx.arc(cx, cy, 115, 0, Math.PI * 2);
+    arcCtx.strokeStyle = state.arcPowerPct > 200 ? 'rgba(255, 183, 0, 0.4)' : 'rgba(0, 243, 255, 0.2)';
+    arcCtx.lineWidth = 4;
+    arcCtx.stroke();
+
+    arcCtx.save();
+    arcCtx.translate(cx, cy);
+    arcCtx.rotate(arcRotation);
+    const segments = 12;
+    for (let i = 0; i < segments; i++) {
+      const angle = (i * Math.PI * 2) / segments;
+      arcCtx.beginPath();
+      arcCtx.arc(0, 0, 100, angle, angle + 0.35);
+      arcCtx.strokeStyle = state.arcPowerPct > 200 ? '#ffb700' : '#00f3ff';
+      arcCtx.lineWidth = 6;
+      arcCtx.shadowColor = state.arcPowerPct > 200 ? '#ffb700' : '#00f3ff';
+      arcCtx.shadowBlur = 12;
+      arcCtx.stroke();
+    }
+    arcCtx.restore();
+
+    arcCtx.save();
+    arcCtx.translate(cx, cy);
+    arcCtx.rotate(-arcRotation * 1.5);
+    const innerSegments = 8;
+    for (let i = 0; i < innerSegments; i++) {
+      const angle = (i * Math.PI * 2) / innerSegments;
+      arcCtx.beginPath();
+      arcCtx.arc(0, 0, 75, angle, angle + 0.5);
+      arcCtx.strokeStyle = state.arcPowerPct > 200 ? '#ff2a55' : '#0066ff';
+      arcCtx.lineWidth = 5;
+      arcCtx.shadowColor = state.arcPowerPct > 200 ? '#ff2a55' : '#0066ff';
+      arcCtx.shadowBlur = 10;
+      arcCtx.stroke();
+    }
+    arcCtx.restore();
+
+    const gradient = arcCtx.createRadialGradient(cx, cy, 10, cx, cy, 55);
+    if (state.arcPowerPct > 200) {
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      gradient.addColorStop(0.3, 'rgba(255, 183, 0, 0.9)');
+      gradient.addColorStop(0.7, 'rgba(255, 42, 85, 0.6)');
+      gradient.addColorStop(1, 'transparent');
+    } else {
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+      gradient.addColorStop(0.3, 'rgba(0, 243, 255, 0.8)');
+      gradient.addColorStop(0.7, 'rgba(0, 102, 255, 0.4)');
+      gradient.addColorStop(1, 'transparent');
+    }
+
+    arcCtx.beginPath();
+    arcCtx.arc(cx, cy, 55, 0, Math.PI * 2);
+    arcCtx.fillStyle = gradient;
+    arcCtx.fill();
+
+    arcRotation += 0.015 * Math.max(0.5, speedMult);
+  }
+
+  let vizPhase = 0;
+  function drawAudioViz() {
+    const w = audioVizCanvas.width;
+    const h = audioVizCanvas.height;
+    audioVizCtx.clearRect(0, 0, w, h);
+
+    audioVizCtx.beginPath();
+    audioVizCtx.moveTo(0, h / 2);
+
+    const points = 50;
+    const step = w / points;
+
+    for (let i = 0; i <= points; i++) {
+      const x = i * step;
+      let amp = 2;
+      if (isAudioVizActive) {
+        amp = Math.sin(i * 0.3 + vizPhase) * 14 + Math.cos(i * 0.5 - vizPhase) * 8;
+      } else {
+        amp = Math.sin(i * 0.2 + vizPhase) * 3;
+      }
+      const y = h / 2 + amp;
+      audioVizCtx.lineTo(x, y);
+    }
+
+    audioVizCtx.strokeStyle = isAudioVizActive ? '#00f3ff' : 'rgba(0, 243, 255, 0.4)';
+    audioVizCtx.lineWidth = 2;
+    audioVizCtx.shadowColor = '#00f3ff';
+    audioVizCtx.shadowBlur = isAudioVizActive ? 10 : 2;
+    audioVizCtx.stroke();
+
+    vizPhase += 0.15;
+  }
+
+  function drawRadar() {
+    const w = radarCanvas.width;
+    const h = radarCanvas.height;
+    const cx = w / 2;
+    const cy = h / 2;
+    const radius = w / 2 - 8;
+
+    radarCtx.clearRect(0, 0, w, h);
+
+    radarCtx.strokeStyle = 'rgba(0, 243, 255, 0.25)';
+    radarCtx.lineWidth = 1;
+    [0.3, 0.6, 0.9].forEach(factor => {
+      radarCtx.beginPath();
+      radarCtx.arc(cx, cy, radius * factor, 0, Math.PI * 2);
+      radarCtx.stroke();
+    });
+
+    radarCtx.beginPath();
+    radarCtx.moveTo(cx - radius, cy);
+    radarCtx.lineTo(cx + radius, cy);
+    radarCtx.moveTo(cx, cy - radius);
+    radarCtx.lineTo(cx, cy + radius);
+    radarCtx.stroke();
+
+    radarCtx.save();
+    radarCtx.translate(cx, cy);
+    radarCtx.rotate(state.radarAngle);
+
+    const grad = radarCtx.createConicGradient(0, 0, 0);
+    grad.addColorStop(0, 'rgba(0, 243, 255, 0.4)');
+    grad.addColorStop(0.15, 'rgba(0, 243, 255, 0.05)');
+    grad.addColorStop(0.3, 'transparent');
+    grad.addColorStop(1, 'transparent');
+
+    radarCtx.beginPath();
+    radarCtx.moveTo(0, 0);
+    radarCtx.arc(0, 0, radius, -0.5, 0);
+    radarCtx.fillStyle = grad;
+    radarCtx.fill();
+
+    radarCtx.beginPath();
+    radarCtx.moveTo(0, 0);
+    radarCtx.lineTo(radius, 0);
+    radarCtx.strokeStyle = '#00f3ff';
+    radarCtx.lineWidth = 2;
+    radarCtx.shadowColor = '#00f3ff';
+    radarCtx.shadowBlur = 8;
+    radarCtx.stroke();
+
+    radarCtx.restore();
+
+    state.targets.forEach(target => {
+      const rad = (target.angle * Math.PI) / 180;
+      const tx = cx + Math.cos(rad) * (radius * target.dist);
+      const ty = cy + Math.sin(rad) * (radius * target.dist);
+
+      radarCtx.beginPath();
+      radarCtx.arc(tx, ty, 4, 0, Math.PI * 2);
+      radarCtx.fillStyle = target.type === 'hostile' ? '#ff2a55' : '#00ff88';
+      radarCtx.shadowColor = target.type === 'hostile' ? '#ff2a55' : '#00ff88';
+      radarCtx.shadowBlur = 6;
+      radarCtx.fill();
+
+      radarCtx.font = '7px "Share Tech Mono"';
+      radarCtx.fillStyle = '#d0f4ff';
+      radarCtx.fillText(target.label, tx + 5, ty + 2);
+    });
+
+    state.radarAngle += 0.03;
+  }
+
+  function renderLoop() {
+    drawArcReactor();
+    drawAudioViz();
+    drawRadar();
+    requestAnimationFrame(renderLoop);
+  }
+  renderLoop();
+
+  // --------------------------------------------------------------------------
+  // TERMINAL & CHAT ENGINE
+  // --------------------------------------------------------------------------
+  function addMessage(sender, text, role) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `chat-msg ${role}`;
+
+    const header = document.createElement('div');
+    header.className = 'msg-header';
+    const timeStr = new Date().toLocaleTimeString().split(' ')[0];
+    header.innerHTML = `<span>${sender}</span> <span>${timeStr}</span>`;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.textContent = text;
+
+    msgDiv.appendChild(header);
+    msgDiv.appendChild(bubble);
+
+    chatWindow.appendChild(msgDiv);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function addJarvisMessage(text) {
+    addMessage('J.A.R.V.I.S.', text, 'jarvis');
+  }
+
+  function addUserMessage(text) {
+    addMessage(state.userName.toUpperCase(), text, 'user');
+  }
+
+  // --------------------------------------------------------------------------
+  // MCU PROTOCOLS RENDERING & TOGGLE HANDLERS
+  // --------------------------------------------------------------------------
+  function renderMcuProtocols() {
+    mcuProtocolGrid.innerHTML = '';
+    state.protocols.forEach(proto => {
+      const card = document.createElement('div');
+      card.className = `protocol-card ${proto.active ? (proto.alertStyle ? 'alert-active' : 'active') : ''}`;
+      card.setAttribute('data-id', proto.id);
+
+      const movieEl = document.createElement('div');
+      movieEl.className = 'p-movie';
+      movieEl.textContent = proto.movie;
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'p-title';
+      titleEl.textContent = proto.name;
+
+      const statusEl = document.createElement('div');
+      statusEl.className = 'p-status';
+      statusEl.textContent = proto.active ? (proto.alertStyle ? 'ARMED / ACTIVE' : 'ACTIVE / ONLINE') : 'OFFLINE';
+
+      card.appendChild(movieEl);
+      card.appendChild(titleEl);
+      card.appendChild(statusEl);
+
+      card.addEventListener('click', () => {
+        toggleProtocol(proto.id);
+      });
+
+      mcuProtocolGrid.appendChild(card);
+    });
+  }
+
+  function toggleProtocol(protoId) {
+    const proto = state.protocols.find(p => p.id === protoId);
+    if (!proto) return;
+
+    proto.active = !proto.active;
+    renderMcuProtocols();
+
+    if (proto.active) {
+      playSciFiSound(proto.alertStyle ? 'alert' : 'beep');
+
+      if (proto.id === 'barndoor') {
+        const commsList = "• Pepper Potts (Stark Industries CEO)\n• Peter Parker (Spider-Man)\n• James Rhodes (War Machine)\n• Happy Hogan (Security)\n• Bruce Banner (Hulk)\n• Steve Rogers (Captain America)\n• Thor Odinson\n• Natasha Romanoff (Black Widow)\n• Clint Barton (Hawkeye)\n• Stephen Strange (Doctor Strange)\n• Carol Danvers (Captain Marvel)\n• T'Challa (Black Panther)\n• Scott Lang (Ant-Man)\n• Nick Fury (S.H.I.E.L.D.)\n• Wanda Maximoff, Vision, Sam Wilson, Bucky Barnes, Wong & all contacts.";
+        const msg = `BARN DOOR PROTOCOL ENGAGED, ${state.userName}. Initiating high-priority Stark Quantum Comms Link...\n\nBROADCASTING TO ALL CONTACTS:\n${commsList}`;
+        addJarvisMessage(msg);
+        speak(`Barn Door Protocol engaged, ${state.userName}. Transmitting encrypted emergency comms link to Peter Parker, Pepper Potts, and all Avengers.`);
+        playSciFiSound('alert');
+        state.targets.push({ id: Date.now(), dist: 0.2, angle: 30, label: "PEPPER POTTS", type: "friendly" });
+        state.targets.push({ id: Date.now()+1, dist: 0.3, angle: 90, label: "PETER PARKER", type: "friendly" });
+        state.targets.push({ id: Date.now()+2, dist: 0.5, angle: 150, label: "AVENGERS COMMS LINK", type: "friendly" });
+        document.getElementById('radar-targets-count').textContent = `${state.targets.length} TARGETS`;
+        return;
+      }
+
+      const msg = `Protocol ${proto.name} engaged, ${state.userName}. (${proto.movie}) - ${proto.description}`;
+      addJarvisMessage(msg);
+      speak(`${proto.name} engaged, ${state.userName}.`);
+
+      if (proto.id === 'lightningcharge') {
+        state.arcPowerPct = 475;
+        state.energyOutput = 48.5;
+        state.voltage = 5.75;
+        elArcPowerPct.textContent = '475%';
+        elArcPowerLbl.textContent = 'OVERCHARGE';
+        elEnergyOut.textContent = '48.5 GJ/s';
+        elVoltage.textContent = '5.75 GW';
+        elMatrix.textContent = 'THOR CHARGE';
+        elMatrix.className = 't-value text-gold';
+        playSciFiSound('charge');
+      } else if (proto.id === 'edith') {
+        state.targets.push({ id: Date.now(), dist: 0.4, angle: 120, label: "EDITH DRONE 01", type: "friendly" });
+        state.targets.push({ id: Date.now()+1, dist: 0.7, angle: 210, label: "EDITH DRONE 02", type: "friendly" });
+        document.getElementById('radar-targets-count').textContent = `${state.targets.length} TARGETS`;
+      }
+    } else {
+      playSciFiSound('beep');
+      const msg = `Protocol ${proto.name} deactivated, ${state.userName}.`;
+      addJarvisMessage(msg);
+      speak(`${proto.name} deactivated.`);
+
+      if (proto.id === 'lightningcharge') {
+        state.arcPowerPct = 100;
+        state.energyOutput = 10.2;
+        state.voltage = 1.21;
+        elArcPowerPct.textContent = '100%';
+        elArcPowerLbl.textContent = 'OUTPUT';
+        elEnergyOut.textContent = '10.2 GJ/s';
+        elVoltage.textContent = '1.21 GW';
+        elMatrix.textContent = 'STABLE';
+        elMatrix.className = 't-value color-cyan';
+      }
+    }
+  }
+
+  renderMcuProtocols();
+
+  // --------------------------------------------------------------------------
+  // STARK SCIENTIFIC MATH & PHYSICS SOLVER
+  // --------------------------------------------------------------------------
+  function evaluateStarkMath(expr) {
+    try {
+      // Clean query string
+      let sanitized = expr.replace(/calculate|compute|solve|convert|to megajoules|to gigawatts|what is/gi, '').trim();
+
+      // Unit conversions
+      if (expr.toLowerCase().includes('gw') && expr.toLowerCase().includes('megajoules')) {
+        const num = parseFloat(sanitized);
+        if (!isNaN(num)) {
+          return `${num} GW is equal to ${num * 1000} Megajoules per second (MJ/s).`;
+        }
+      }
+
+      // Safe arithmetic evaluator
+      sanitized = sanitized.replace(/x/g, '*').replace(/times/g, '*').replace(/plus/g, '+').replace(/minus/g, '-').replace(/divided by/g, '/');
+      if (/^[0-9\.\s\+\-\*\/\(\)]+$/.test(sanitized)) {
+        const result = Function(`'use strict'; return (${sanitized})`)();
+        return `Calculation complete, ${state.userName}: ${sanitized} = ${result}`;
+      }
+    } catch (e) {
+      console.warn("Math calculation error:", e);
+    }
+    return null;
+  }
+
+  // --------------------------------------------------------------------------
+  // NATURAL LANGUAGE COMMAND PROCESSOR (INTELLIGENT ML ROUTER)
+  // --------------------------------------------------------------------------
+  function handleCommandSubmit(rawInput) {
+    const input = rawInput.trim();
+    if (!input) return;
+
+    addUserMessage(input);
+    commandInput.value = '';
+    playSciFiSound('beep');
+
+    setTimeout(() => {
+      processJarvisCommand(input);
+    }, 300);
+  }
+
+  commandForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleCommandSubmit(commandInput.value);
+  });
+
+  document.querySelectorAll('.btn-action').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cmd = btn.getAttribute('data-cmd');
+      if (cmd) {
+        handleCommandSubmit(cmd);
+      }
+    });
+  });
+
+  function processJarvisCommand(cmd) {
+    const classification = neuralClassifier.classify(cmd);
+    updateNeuralMemory(cmd, classification.intent, classification.confidence);
+
+    const intent = classification.intent;
+    const query = cmd.toLowerCase();
+
+    // Check Math / Physics solver first
+    const mathResult = evaluateStarkMath(cmd);
+    if (mathResult) {
+      addJarvisMessage(mathResult);
+      speak(mathResult);
+      return;
+    }
+
+    // Machine Learning Intent Switch Router
+    switch (intent) {
+      case 'protocol_barndoor':
+        toggleProtocol('barndoor');
+        break;
+      case 'protocol_houseparty':
+        toggleProtocol('houseparty');
+        break;
+      case 'protocol_cleanslate':
+        toggleProtocol('cleanslate');
+        break;
+      case 'protocol_veronica':
+        toggleProtocol('veronica');
+        break;
+      case 'protocol_edith':
+        toggleProtocol('edith');
+        break;
+      case 'protocol_instantkill':
+        toggleProtocol('instantkill');
+        break;
+      case 'protocol_thorcharge':
+        toggleProtocol('lightningcharge');
+        break;
+      case 'protocol_timeheist':
+        toggleProtocol('timeheist');
+        break;
+      case 'protocol_stealth':
+        toggleProtocol('stealth');
+        break;
+      case 'protocol_nanorepair':
+        toggleProtocol('nanorepair');
+        break;
+      case 'diagnostics':
+        const diag = `All Mark LXXXV systems operational, ${state.userName}. Arc Reactor core temperature is at ${state.coreTemp}°C with energy output at ${state.energyOutput} GJ/s. Armor integrity is at 100%. Nano-repair reserve at 98%. ML Confidence: ${(classification.confidence * 100).toFixed(1)}%.`;
+        addJarvisMessage(diag);
+        speak(diag);
+        playSciFiSound('beep');
+        break;
+      case 'fire_repulsors':
+        const rep = `Repulsors charged and fired, ${state.userName}. Target neutralized with zero collateral damage. Beam intensity recalibrated to maximum output.`;
+        addJarvisMessage(rep);
+        speak(rep);
+        playSciFiSound('repulsor');
+        break;
+      case 'stark_tower':
+        const tow = `Stark Tower clean arc energy grid is operating at peak efficiency, ${state.userName}. Main penthouse suite power draw is normal. Cybernetic security protocols engaged.`;
+        addJarvisMessage(tow);
+        speak(tow);
+        break;
+      case 'weather_report':
+        const wth = `Current local conditions: 22°C with clear skies, wind speeds at 8 knots from the West. Optimal conditions for high-altitude repulsor flight tests, ${state.userName}.`;
+        addJarvisMessage(wth);
+        speak(wth);
+        break;
+      case 'neural_memory':
+        const topP = document.getElementById('ml-top-pref').textContent;
+        const memMsg = `Neural Learning Memory Summary, ${state.userName}:\nTotal Queries Analyzed: ${state.neuralMemory.totalQueries}\nTop Preferred Interaction: ${topP}\nActive ML Classifier: Naive Bayes TF-IDF Probability Model (99.8% precision).`;
+        addJarvisMessage(memMsg);
+        speak(`Neural Learning Memory summary generated, ${state.userName}. Processed ${state.neuralMemory.totalQueries} queries.`);
+        break;
+      case 'greetings':
+        const greet = `Always a pleasure to assist you, ${state.userName}. Neural AI model active and standing by. How may I be of service today?`;
+        addJarvisMessage(greet);
+        speak(greet);
+        break;
+      case 'capabilities':
+        const cap = `I am equipped with a Naive Bayes Machine Learning Intent Classifier, Neural Learning Memory, Math/Physics solver, and 15 MCU Protocols, ${state.userName}. Type or speak any command.`;
+        addJarvisMessage(cap);
+        speak(cap);
+        break;
+      default:
+        // Default intelligent neural fallback
+        const fallback = `Analyzing query: "${cmd}" via Neural ML Engine (Confidence: ${(classification.confidence * 100).toFixed(1)}%). MCU database search complete, ${state.userName}. Standby for execution.`;
+        addJarvisMessage(fallback);
+        speak(fallback);
+        break;
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // TASKS & MEMO INTERACTIONS
+  // --------------------------------------------------------------------------
+  function renderTasks() {
+    taskListEl.innerHTML = '';
+    state.tasks.forEach(task => {
+      const item = document.createElement('div');
+      item.className = `task-item ${task.completed ? 'completed' : ''}`;
+
+      const textSpan = document.createElement('span');
+      textSpan.textContent = `• ${task.text}`;
+      textSpan.style.cursor = 'pointer';
+      textSpan.addEventListener('click', () => {
+        task.completed = !task.completed;
+        saveTasks();
+        renderTasks();
+      });
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn-del-task';
+      delBtn.textContent = '✕';
+      delBtn.title = 'Delete task';
+      delBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.tasks = state.tasks.filter(t => t.id !== task.id);
+        saveTasks();
+        renderTasks();
+      });
+
+      item.appendChild(textSpan);
+      item.appendChild(delBtn);
+      taskListEl.appendChild(item);
+    });
+  }
+
+  function saveTasks() {
+    localStorage.setItem('jarvis_tasks', JSON.stringify(state.tasks));
+  }
+
+  function addTask(text) {
+    state.tasks.push({
+      id: Date.now(),
+      text: text,
+      completed: false
+    });
+    saveTasks();
+    renderTasks();
+  }
+
+  btnAddTask.addEventListener('click', () => {
+    const text = prompt("Enter new Stark task/memo:", "Calibrate ARC reactor");
+    if (text && text.trim()) {
+      addTask(text.trim());
+      speak(`Task added, ${state.userName}.`);
+    }
+  });
+
+  renderTasks();
+
+  // INITIAL JARVIS WELCOME GREETING
+  setTimeout(() => {
+    const welcome = `Welcome back, ${state.userName}. Neural Machine Learning Engine online. MCU Master Database loaded with 15 active Iron Man protocols. Arc Reactor output at 100%. How may I assist you today?`;
+    addJarvisMessage(welcome);
+    speak(welcome);
+  }, 600);
+
+});
+  </script>
+</body>
+</html>
