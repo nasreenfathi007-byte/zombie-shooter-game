@@ -962,7 +962,7 @@ body {
         <div class="hud-title">MCU TACTICAL HUB</div>
         <div class="sys-status" id="sys-status-indicator">
           <span class="status-dot pulsing"></span>
-          <span id="sys-status-text">14 PROTOCOLS LOADED</span>
+          <span id="sys-status-text">15 PROTOCOLS LOADED</span>
         </div>
       </div>
 
@@ -1104,6 +1104,7 @@ body {
 
         <!-- Quick Action Protocols Bar -->
         <div class="quick-actions-bar">
+          <button class="btn-action" data-cmd="Barn Door Protocol">🚪 BARN DOOR</button>
           <button class="btn-action" data-cmd="House Party Protocol">🚀 HOUSE PARTY</button>
           <button class="btn-action" data-cmd="EDITH Drone Mesh">🕶️ EDITH MESH</button>
           <button class="btn-action" data-cmd="Veronica Link">🛰️ VERONICA</button>
@@ -1205,6 +1206,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // MCU PROTOCOLS DEFINITION DATABASE
   // --------------------------------------------------------------------------
   const MCU_PROTOCOLS = [
+    {
+      id: 'barndoor',
+      name: 'BARN DOOR PROTOCOL',
+      movie: 'AVENGERS: ENDGAME / MCU',
+      description: 'Emergency high-priority comms broadcast calling Peter Parker, Pepper Potts, and all Avengers & allies.',
+      active: false,
+      alertStyle: true
+    },
     {
       id: 'houseparty',
       name: 'HOUSE PARTY',
@@ -1886,6 +1895,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (proto.active) {
       playSciFiSound(proto.alertStyle ? 'alert' : 'beep');
+
+      if (proto.id === 'barndoor') {
+        const commsList = "• Pepper Potts (Stark Industries CEO)\n• Peter Parker (Spider-Man)\n• James Rhodes (War Machine)\n• Happy Hogan (Security)\n• Bruce Banner (Hulk)\n• Steve Rogers (Captain America)\n• Thor Odinson\n• Natasha Romanoff (Black Widow)\n• Clint Barton (Hawkeye)\n• Stephen Strange (Doctor Strange)\n• Carol Danvers (Captain Marvel)\n• T'Challa (Black Panther)\n• Scott Lang (Ant-Man)\n• Nick Fury (S.H.I.E.L.D.)\n• Wanda Maximoff, Vision, Sam Wilson, Bucky Barnes, Wong & all contacts.";
+        const msg = `BARN DOOR PROTOCOL ENGAGED, ${state.userName}. Initiating high-priority Stark Quantum Comms Link...\n\nBROADCASTING TO ALL CONTACTS:\n${commsList}`;
+        addJarvisMessage(msg);
+        speak(`Barn Door Protocol engaged, ${state.userName}. Transmitting encrypted emergency comms link to Peter Parker, Pepper Potts, and all Avengers.`);
+        playSciFiSound('alert');
+        state.targets.push({ id: Date.now(), dist: 0.2, angle: 30, label: "PEPPER POTTS", type: "friendly" });
+        state.targets.push({ id: Date.now()+1, dist: 0.3, angle: 90, label: "PETER PARKER", type: "friendly" });
+        state.targets.push({ id: Date.now()+2, dist: 0.5, angle: 150, label: "AVENGERS COMMS LINK", type: "friendly" });
+        document.getElementById('radar-targets-count').textContent = `${state.targets.length} TARGETS`;
+        return;
+      }
+
       const msg = `Protocol ${proto.name} engaged, ${state.userName}. (${proto.movie}) - ${proto.description}`;
       addJarvisMessage(msg);
       speak(`${proto.name} engaged, ${state.userName}.`);
@@ -1963,8 +1986,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function processJarvisCommand(cmd) {
     const query = cmd.toLowerCase();
 
+    // 0. Barn Door Protocol (Endgame / Call Peter Parker, Pepper Potts, Avengers & allies)
+    if (query.includes('barn door') || query.includes('barndoor') || query.includes('call everyone') || query.includes('call avengers') || query.includes('contact peter') || query.includes('call pepper')) {
+      toggleProtocol('barndoor');
+    }
     // 1. Diagnostics / Suit Status
-    if (query.includes('diagnostic') || query.includes('status') || query.includes('suit') || query.includes('health')) {
+    else if (query.includes('diagnostic') || query.includes('status') || query.includes('suit') || query.includes('health')) {
       const resp = `All Mark LXXXV systems operational, ${state.userName}. Arc Reactor core temperature is at ${state.coreTemp}°C with energy output at ${state.energyOutput} GJ/s. Armor integrity is at 100%. Nano-repair reserve at 98%.`;
       addJarvisMessage(resp);
       speak(resp);
@@ -2078,13 +2105,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // 21. Help / MCU Protocols List
     else if (query.includes('help') || query.includes('capabilities') || query.includes('mcu protocols') || query.includes('what can you do')) {
       const protoNames = state.protocols.map(p => p.name).join(', ');
-      const resp = `I have loaded 14 MCU Iron Man Protocols: ${protoNames}. You can trigger any protocol by typing its name, clicking the protocol cards on the right panel, or using voice commands, ${state.userName}.`;
+      const resp = `I have loaded 15 MCU Iron Man Protocols including Barn Door Protocol: ${protoNames}. You can trigger any protocol by typing its name, clicking the protocol cards on the right panel, or using voice commands, ${state.userName}.`;
       addJarvisMessage(resp);
       speak(resp);
     }
     // Default fallback intelligence
     else {
-      const resp = `Analyzing query: "${cmd}". MCU database search complete, ${state.userName}. All 14 Iron Man protocols standing by.`;
+      const resp = `Analyzing query: "${cmd}". MCU database search complete, ${state.userName}. All 15 Iron Man protocols standing by.`;
       addJarvisMessage(resp);
       speak(resp);
     }
@@ -2151,7 +2178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // INITIAL JARVIS WELCOME GREETING
   setTimeout(() => {
-    const welcome = `Welcome back, ${state.userName}. MCU Master Database loaded with 14 active Iron Man protocols. Arc Reactor output is at 100%. How may I assist you today?`;
+    const welcome = `Welcome back, ${state.userName}. MCU Master Database loaded with 15 active Iron Man protocols including Barn Door Protocol. Arc Reactor output is at 100%. How may I assist you today?`;
     addJarvisMessage(welcome);
     speak(welcome);
   }, 600);
